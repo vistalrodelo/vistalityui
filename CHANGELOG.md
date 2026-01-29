@@ -1,3 +1,6 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Initial intuitive ui components.
+
+## 0.0.2
+* Clean up
