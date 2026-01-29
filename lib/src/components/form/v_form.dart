@@ -1,0 +1,539 @@
+import 'package:flutter/material.dart';
+import '../../foundation/v_intent.dart';
+import '../button/v_button.dart';
+import '../checkbox/v_checkbox.dart';
+import '../dropdown/v_dropdown.dart';
+import '../dropdown/v_multi_select_dropdown.dart';
+import '../radio/v_radio.dart';
+import '../textbox/v_textbox.dart';
+
+enum VFormFieldType {
+  text,
+  multiline,
+  password,
+  dropdown,
+  multiselect,
+  checkbox,
+  radio,
+}
+
+class VRadioOption<T> {
+  final T value;
+  final String label;
+  final Widget? child;
+
+  const VRadioOption({
+    required this.value,
+    required this.label,
+    this.child,
+  });
+}
+
+class VFormFieldConfig<T> {
+  final String id;
+  final VFormFieldType type;
+  final String label;
+  final String? hint;
+  final bool required;
+  final bool enabled;
+
+  final TextEditingController? controller;
+  final String? initialText;
+  final bool allowClearButton;
+  final bool allowNewLineButton;
+  final int? maxLength;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final Object? prefixIcon;
+  final Object? suffixIcon;
+
+  final List<VDropdownItem<T>>? items;
+  final List<VMultiSelectItem<T>>? multiItems;
+  final List<VRadioOption<T>>? radioOptions;
+  final T? initialValue;
+  final List<T>? initialValues;
+  final String? Function(String value)? validator;
+  final String? Function(Object? value)? validatorAny;
+  final bool? checkboxInitialValue;
+
+  VFormFieldConfig._({
+    required this.id,
+    required this.type,
+    required this.label,
+    this.hint,
+    this.required = false,
+    this.enabled = true,
+    this.controller,
+    this.initialText,
+    this.allowClearButton = false,
+    this.allowNewLineButton = false,
+    this.maxLength,
+    this.keyboardType,
+    this.textInputAction,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.items,
+    this.multiItems,
+    this.radioOptions,
+    this.initialValue,
+    this.initialValues,
+    this.validator,
+    this.validatorAny,
+    this.checkboxInitialValue,
+  });
+
+  VFormFieldConfig.text({
+    required String id,
+    required String label,
+    String? hint,
+    bool required = false,
+    bool enabled = true,
+    TextEditingController? controller,
+    String? initialText,
+    bool allowClearButton = false,
+    int? maxLength,
+    TextInputType? keyboardType,
+    TextInputAction? textInputAction,
+    Object? prefixIcon,
+    Object? suffixIcon,
+    String? Function(String value)? validator,
+  }) : this._(
+          id: id,
+          type: VFormFieldType.text,
+          label: label,
+          hint: hint,
+          required: required,
+          enabled: enabled,
+          controller: controller,
+          initialText: initialText,
+          allowClearButton: allowClearButton,
+          maxLength: maxLength,
+          keyboardType: keyboardType,
+          textInputAction: textInputAction,
+          prefixIcon: prefixIcon,
+          suffixIcon: suffixIcon,
+          validator: validator,
+        );
+
+  VFormFieldConfig.multiline({
+    required String id,
+    required String label,
+    String? hint,
+    bool required = false,
+    bool enabled = true,
+    TextEditingController? controller,
+    String? initialText,
+    bool allowClearButton = false,
+    bool allowNewLineButton = true,
+    int? maxLength,
+    Object? prefixIcon,
+    Object? suffixIcon,
+    String? Function(String value)? validator,
+  }) : this._(
+          id: id,
+          type: VFormFieldType.multiline,
+          label: label,
+          hint: hint,
+          required: required,
+          enabled: enabled,
+          controller: controller,
+          initialText: initialText,
+          allowClearButton: allowClearButton,
+          allowNewLineButton: allowNewLineButton,
+          maxLength: maxLength,
+          prefixIcon: prefixIcon,
+          suffixIcon: suffixIcon,
+          validator: validator,
+        );
+
+  VFormFieldConfig.password({
+    required String id,
+    required String label,
+    String? hint,
+    bool required = false,
+    bool enabled = true,
+    TextEditingController? controller,
+    String? initialText,
+    bool allowClearButton = false,
+    Object? prefixIcon,
+    Object? suffixIcon,
+    String? Function(String value)? validator,
+  }) : this._(
+          id: id,
+          type: VFormFieldType.password,
+          label: label,
+          hint: hint,
+          required: required,
+          enabled: enabled,
+          controller: controller,
+          initialText: initialText,
+          allowClearButton: allowClearButton,
+          prefixIcon: prefixIcon,
+          suffixIcon: suffixIcon,
+          validator: validator,
+        );
+
+  VFormFieldConfig.dropdown({
+    required String id,
+    required String label,
+    String? hint,
+    bool required = false,
+    bool enabled = true,
+    required List<VDropdownItem<T>> items,
+    T? initialValue,
+    String? Function(T? value)? validator,
+  }) : this._(
+          id: id,
+          type: VFormFieldType.dropdown,
+          label: label,
+          hint: hint,
+          required: required,
+          enabled: enabled,
+          items: items,
+          initialValue: initialValue,
+          validatorAny: validator == null ? null : (v) => validator(v is T ? v : null),
+        );
+
+  VFormFieldConfig.multiselect({
+    required String id,
+    required String label,
+    String? hint,
+    bool required = false,
+    bool enabled = true,
+    required List<VMultiSelectItem<T>> items,
+    List<T>? initialValues,
+    String? Function(List<T> values)? validator,
+  }) : this._(
+          id: id,
+          type: VFormFieldType.multiselect,
+          label: label,
+          hint: hint,
+          required: required,
+          enabled: enabled,
+          multiItems: items,
+          initialValues: initialValues,
+          validatorAny: validator == null
+              ? null
+              : (v) => validator(v is List<T> ? v : List<T>.from(v as List)),
+        );
+
+  VFormFieldConfig.checkbox({
+    required String id,
+    required String label,
+    bool required = false,
+    bool enabled = true,
+    bool initialValue = false,
+    String? Function(bool value)? validator,
+  }) : this._(
+          id: id,
+          type: VFormFieldType.checkbox,
+          label: label,
+          required: required,
+          enabled: enabled,
+          checkboxInitialValue: initialValue,
+          validatorAny: validator == null ? null : (v) => validator(v is bool ? v : false),
+        );
+
+  VFormFieldConfig.radio({
+    required String id,
+    required String label,
+    bool required = false,
+    bool enabled = true,
+    required List<VRadioOption<T>> options,
+    T? initialValue,
+    String? Function(T? value)? validator,
+  }) : this._(
+          id: id,
+          type: VFormFieldType.radio,
+          label: label,
+          required: required,
+          enabled: enabled,
+          radioOptions: options,
+          initialValue: initialValue,
+          validatorAny: validator == null ? null : (v) => validator(v is T ? v : null),
+        );
+}
+
+typedef VFormSubmit = void Function(Map<String, dynamic> values);
+
+class VForm extends StatefulWidget {
+  final List<VFormFieldConfig> fields;
+  final int columns;
+  final double spacing;
+  final String submitLabel;
+  final String cancelLabel;
+  final VoidCallback? onCancel;
+  final VFormSubmit? onSubmit;
+
+  const VForm({
+    super.key,
+    required this.fields,
+    this.columns = 1,
+    this.spacing = 12,
+    this.submitLabel = 'Submit',
+    this.cancelLabel = 'Cancel',
+    this.onCancel,
+    this.onSubmit,
+  }) : assert(columns >= 1 && columns <= 4);
+
+  @override
+  State<VForm> createState() => _VFormState();
+}
+
+class _VFormState extends State<VForm> {
+  final Map<String, dynamic> _values = {};
+  final Map<String, String?> _errors = {};
+  final Map<String, TextEditingController> _controllers = {};
+
+  @override
+  void initState() {
+    super.initState();
+    for (final field in widget.fields) {
+      switch (field.type) {
+        case VFormFieldType.text:
+        case VFormFieldType.multiline:
+        case VFormFieldType.password:
+          final controller = field.controller ??
+              TextEditingController(text: field.initialText ?? '');
+          if (field.controller == null) {
+            _controllers[field.id] = controller;
+          }
+          _values[field.id] = controller.text;
+          break;
+        case VFormFieldType.dropdown:
+        case VFormFieldType.radio:
+          _values[field.id] = field.initialValue;
+          break;
+        case VFormFieldType.multiselect:
+          _values[field.id] = List.from(field.initialValues ?? const []);
+          break;
+        case VFormFieldType.checkbox:
+          _values[field.id] = field.checkboxInitialValue ?? false;
+          break;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final controller in _controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = widget.columns.clamp(1, 4);
+        final spacing = widget.spacing;
+        final width = constraints.maxWidth;
+        final itemWidth = (width - spacing * (columns - 1)) / columns;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              spacing: spacing,
+              runSpacing: spacing,
+              children: widget.fields
+                  .map((field) => SizedBox(
+                        width: itemWidth,
+                        child: _buildField(field),
+                      ))
+                  .toList(),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                VButton(
+                  label: widget.cancelLabel,
+                  intent: VIntent.secondary,
+                  onPressed: widget.onCancel ?? () {},
+                ),
+                const SizedBox(width: 12),
+                VButton(
+                  label: widget.submitLabel,
+                  onPressed: _handleSubmit,
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildField(VFormFieldConfig field) {
+    final error = _errors[field.id];
+    switch (field.type) {
+      case VFormFieldType.text:
+      case VFormFieldType.multiline:
+      case VFormFieldType.password:
+        final controller = field.controller ?? _controllers[field.id]!;
+        return VTextBox(
+          controller: controller,
+          label: _label(field),
+          hint: field.hint,
+          errorText: error,
+          enabled: field.enabled,
+          multiline: field.type == VFormFieldType.multiline,
+          obscureText: field.type == VFormFieldType.password,
+          allowClearButton: field.allowClearButton,
+          allowNewLineButton: field.allowNewLineButton,
+          maxLength: field.maxLength,
+          keyboardType: field.keyboardType,
+          textInputAction: field.textInputAction,
+          prefixIcon: field.prefixIcon,
+          suffixIcon: field.suffixIcon,
+          onChanged: (value) {
+            _values[field.id] = value;
+            _clearError(field.id);
+          },
+        );
+      case VFormFieldType.dropdown:
+        return VDropdown(
+          label: _label(field),
+          hint: field.hint,
+          value: _values[field.id],
+          items: field.items ?? const [],
+          enabled: field.enabled,
+          errorText: error,
+          onChanged: (value) {
+            setState(() {
+              _values[field.id] = value;
+              _errors.remove(field.id);
+            });
+          },
+        );
+      case VFormFieldType.multiselect:
+        return VMultiSelectDropdown(
+          label: _label(field),
+          hint: field.hint,
+          values: List.from(_values[field.id] ?? const []),
+          items: field.multiItems ?? const [],
+          enabled: field.enabled,
+          errorText: error,
+          onChanged: (values) {
+            setState(() {
+              _values[field.id] = values;
+              _errors.remove(field.id);
+            });
+          },
+        );
+      case VFormFieldType.checkbox:
+        final checked = (_values[field.id] ?? false) as bool;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                VCheckbox(
+                  value: checked,
+                  onChanged: field.enabled
+                      ? (v) {
+                          setState(() {
+                            _values[field.id] = v;
+                            _errors.remove(field.id);
+                          });
+                        }
+                      : null,
+                ),
+                const SizedBox(width: 10),
+                Text(_label(field)),
+              ],
+            ),
+            if (error != null) ...[
+              const SizedBox(height: 6),
+              Text(error, style: const TextStyle(color: Colors.red)),
+            ],
+          ],
+        );
+      case VFormFieldType.radio:
+        final options = field.radioOptions ?? const [];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(_label(field)),
+            const SizedBox(height: 6),
+            ...options.map(
+              (opt) => Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: VRadio(
+                  value: opt.value,
+                  groupValue: _values[field.id],
+                  onChanged: field.enabled
+                      ? (v) {
+                          setState(() {
+                            _values[field.id] = v;
+                            _errors.remove(field.id);
+                          });
+                        }
+                      : null,
+                  child: opt.child ?? Text(opt.label),
+                ),
+              ),
+            ),
+            if (error != null) ...[
+              const SizedBox(height: 6),
+              Text(error, style: const TextStyle(color: Colors.red)),
+            ],
+          ],
+        );
+    }
+  }
+
+  void _handleSubmit() {
+    final errors = <String, String?>{};
+    for (final field in widget.fields) {
+      errors[field.id] = _validateField(field);
+    }
+
+    final hasErrors = errors.values.any((e) => e != null);
+    setState(() => _errors
+      ..clear()
+      ..addAll(errors));
+
+    if (hasErrors) return;
+    widget.onSubmit?.call(Map<String, dynamic>.from(_values));
+  }
+
+  String? _validateField(VFormFieldConfig field) {
+    final value = _values[field.id];
+
+    switch (field.type) {
+      case VFormFieldType.text:
+      case VFormFieldType.multiline:
+      case VFormFieldType.password:
+        final text = (value as String?) ?? '';
+        if (text.trim().isEmpty) {
+          return field.required ? 'Required' : null;
+        }
+        return field.validator?.call(text);
+      case VFormFieldType.dropdown:
+      case VFormFieldType.radio:
+        if (value == null) return field.required ? 'Required' : null;
+        return field.validatorAny?.call(value);
+      case VFormFieldType.multiselect:
+        final list = (value as List?) ?? const [];
+        if (list.isEmpty) {
+          return field.required ? 'Select at least one' : null;
+        }
+        return field.validatorAny?.call(list);
+      case VFormFieldType.checkbox:
+        if (value == true) return null;
+        final requiredError = field.required ? 'Required' : null;
+        return field.validatorAny?.call(value) ?? requiredError;
+    }
+  }
+
+  void _clearError(String id) {
+    if (_errors[id] == null) return;
+    setState(() => _errors.remove(id));
+  }
+
+  String _label(VFormFieldConfig field) {
+    return field.required ? '${field.label} *' : field.label;
+  }
+}
