@@ -1,5 +1,5 @@
 name: vistalityui
-description: "A new Flutter package project."
+description: "A Material 3 Flutter UI library with seed-based theming and reusable components."
 version: 0.0.1
 repository: https://gitlab.com/mylibraries2/vistalityui
 
