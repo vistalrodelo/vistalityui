@@ -1,7 +1,7 @@
 name: vistalityui
 description: "A new Flutter package project."
 version: 0.0.1
-homepage:
+repository: https://gitlab.com/mylibraries2/vistalityui
 
 environment:
   sdk: ^3.10.3
