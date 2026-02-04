@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../foundation/v_control_sizes.dart';
-import '../../foundation/v_colors.dart';
-import '../../foundation/v_radius.dart';
 import '../textbox/v_textbox.dart';
 
 /// Dropdown item definition for [VDropdown].
@@ -159,19 +157,6 @@ class _VDropdownState<T> extends State<VDropdown<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    final vc = theme.extension<VColors>() ?? VColors.fromScheme(cs);
-    final borderRadius = context.vRadius.resolveBorderRadius(
-      radius: widget.radius,
-      radiusValue: widget.radiusValue,
-    );
-
-    final border = OutlineInputBorder(
-      borderRadius: borderRadius,
-      borderSide: BorderSide(color: vc.outline),
-    );
-
     final resolvedHeight =
         widget.controlHeight ?? VControlSizes.fieldHeight;
     return SizedBox(
