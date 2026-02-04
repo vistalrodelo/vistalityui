@@ -1,15 +1,30 @@
 import 'package:flutter/material.dart';
 import '../textbox/v_textbox.dart';
 
+/// Read-only text field that opens a time picker.
 class VTimePickerField extends StatelessWidget {
+  /// Currently selected time.
   final TimeOfDay? value;
+
+  /// Called when the time changes.
   final ValueChanged<TimeOfDay?>? onChanged;
+
+  /// Controller for the input display.
   final TextEditingController controller;
+
+  /// Optional label text.
   final String? label;
+
+  /// Optional hint text.
   final String? hint;
+
+  /// Optional prefix icon.
   final Object? prefixIcon;
+
+  /// Optional suffix icon.
   final Object? suffixIcon;
 
+  /// Creates a [VTimePickerField].
   const VTimePickerField({
     super.key,
     required this.controller,
@@ -40,6 +55,7 @@ class VTimePickerField extends StatelessWidget {
           initialTime: value ?? now,
         );
         if (picked != null) {
+          if (!context.mounted) return;
           controller.text = picked.format(context);
         }
         onChanged?.call(picked);

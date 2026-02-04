@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import '../../foundation/v_colors.dart';
 import '../../foundation/v_radius.dart';
 
+/// A small labeled chip with optional delete action.
 class VChip extends StatelessWidget {
+  /// Chip label text.
   final String label;
+
+  /// Called when the delete icon is tapped.
   final VoidCallback? onDeleted;
 
+  /// Creates a [VChip].
   const VChip({
     super.key,
     required this.label,

@@ -1,14 +1,44 @@
 import 'package:flutter/material.dart';
 
-enum VHeadingLevel { h1, h2, h3, h4, h5, h6 }
+/// Heading levels mapped to the theme text styles.
+enum VHeadingLevel {
+  /// Display large heading.
+  h1,
 
+  /// Display medium heading.
+  h2,
+
+  /// Display small heading.
+  h3,
+
+  /// Headline medium heading.
+  h4,
+
+  /// Headline small heading.
+  h5,
+
+  /// Title large heading.
+  h6,
+}
+
+/// Basic text widget wrapper.
 class VText extends StatelessWidget {
+  /// Text content.
   final String text;
+
+  /// Optional text style override.
   final TextStyle? style;
+
+  /// Optional text alignment.
   final TextAlign? textAlign;
+
+  /// Maximum number of lines to display.
   final int? maxLines;
+
+  /// Overflow behavior.
   final TextOverflow? overflow;
 
+  /// Creates a [VText].
   const VText(
     this.text, {
     super.key,
@@ -30,11 +60,18 @@ class VText extends StatelessWidget {
   }
 }
 
+/// Heading text that maps to theme display/title styles.
 class VHeading extends StatelessWidget {
+  /// Text content.
   final String text;
+
+  /// Heading level.
   final VHeadingLevel level;
+
+  /// Optional text alignment.
   final TextAlign? textAlign;
 
+  /// Creates a [VHeading].
   const VHeading(
     this.text, {
     super.key,
@@ -57,8 +94,12 @@ class VHeading extends StatelessWidget {
   }
 }
 
+/// Label text using `labelLarge`.
 class VLabel extends StatelessWidget {
+  /// Text content.
   final String text;
+
+  /// Creates a [VLabel].
   const VLabel(this.text, {super.key});
 
   @override
@@ -67,8 +108,12 @@ class VLabel extends StatelessWidget {
   }
 }
 
+/// Caption text using `bodySmall`.
 class VCaption extends StatelessWidget {
+  /// Text content.
   final String text;
+
+  /// Creates a [VCaption].
   const VCaption(this.text, {super.key});
 
   @override
@@ -77,8 +122,12 @@ class VCaption extends StatelessWidget {
   }
 }
 
+/// Monospace code-style text.
 class VCode extends StatelessWidget {
+  /// Text content.
   final String text;
+
+  /// Creates a [VCode].
   const VCode(this.text, {super.key});
 
   @override
@@ -93,9 +142,15 @@ class VCode extends StatelessWidget {
   }
 }
 
+/// Single-line text with ellipsis overflow by default.
 class VTruncatedText extends StatelessWidget {
+  /// Text content.
   final String text;
+
+  /// Maximum number of lines.
   final int maxLines;
+
+  /// Creates a [VTruncatedText].
   const VTruncatedText(this.text, {super.key, this.maxLines = 1});
 
   @override
@@ -108,8 +163,12 @@ class VTruncatedText extends StatelessWidget {
   }
 }
 
+/// Selectable text wrapper.
 class VSelectableText extends StatelessWidget {
+  /// Text content.
   final String text;
+
+  /// Creates a [VSelectableText].
   const VSelectableText(this.text, {super.key});
 
   @override

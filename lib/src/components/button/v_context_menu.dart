@@ -1,16 +1,26 @@
 import 'package:flutter/material.dart';
 
+/// Item definition for [VContextMenu].
 class VContextMenuItem {
+  /// Label shown in the context menu.
   final String label;
+
+  /// Called when this item is selected.
   final VoidCallback? onSelected;
 
+  /// Creates a [VContextMenuItem].
   const VContextMenuItem({required this.label, this.onSelected});
 }
 
+/// Wraps a child and shows a context menu on right click/long press.
 class VContextMenu extends StatelessWidget {
+  /// Widget that triggers the context menu.
   final Widget child;
+
+  /// Menu items to display.
   final List<VContextMenuItem> items;
 
+  /// Creates a [VContextMenu].
   const VContextMenu({
     super.key,
     required this.child,

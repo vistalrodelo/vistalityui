@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../foundation/v_colors.dart';
 import '../foundation/v_radius.dart';
 
+/// Builds a Material 3 theme using a seed color and radius defaults.
 ThemeData buildTheme(
   Color seed, {
   Brightness brightness = Brightness.light,

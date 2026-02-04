@@ -1,16 +1,30 @@
 import 'package:flutter/material.dart';
 import '../../foundation/v_colors.dart';
 
+/// A custom radio control with optional label.
 class VRadio<T> extends StatelessWidget {
+  /// Value represented by this radio option.
   final T value;
+
+  /// Current selected value for the group.
   final T? groupValue;
+
+  /// Called when the radio is selected.
   final ValueChanged<T>? onChanged;
 
+  /// Whether the radio is enabled.
   final bool enabled;
+
+  /// Diameter of the radio control.
   final double size;
+
+  /// Optional label text.
   final String? label;
+
+  /// Optional custom label widget.
   final Widget? child;
 
+  /// Creates a [VRadio].
   const VRadio({
     super.key,
     required this.value,
@@ -43,9 +57,9 @@ class VRadio<T> extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: enabled ? fillColor : cs.onSurface.withOpacity(0.12),
+          color: enabled ? fillColor : cs.onSurface.withValues(alpha: 0.12),
           border: Border.all(
-            color: enabled ? borderColor : cs.onSurface.withOpacity(0.38),
+            color: enabled ? borderColor : cs.onSurface.withValues(alpha: 0.38),
           ),
         ),
         child: _selected
@@ -55,7 +69,7 @@ class VRadio<T> extends StatelessWidget {
                   height: size * 0.4,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: enabled ? dotColor : cs.onSurface.withOpacity(0.38),
+                    color: enabled ? dotColor : cs.onSurface.withValues(alpha: 0.38),
                   ),
                 ),
               )

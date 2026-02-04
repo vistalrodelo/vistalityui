@@ -2,15 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../textbox/v_textbox.dart';
 
+/// Numeric input built on top of [VTextBox].
 class VNumberInput extends StatelessWidget {
+  /// Controller for the input value.
   final TextEditingController controller;
+
+  /// Optional label text.
   final String? label;
+
+  /// Optional hint text.
   final String? hint;
+
+  /// Optional prefix icon.
   final Object? prefixIcon;
+
+  /// Optional suffix icon.
   final Object? suffixIcon;
+
+  /// Whether decimal values are allowed.
   final bool allowDecimal;
+
+  /// Called when the value changes.
   final ValueChanged<String>? onChanged;
 
+  /// Creates a [VNumberInput].
   const VNumberInput({
     super.key,
     required this.controller,

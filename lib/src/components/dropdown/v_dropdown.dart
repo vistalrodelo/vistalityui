@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 import '../../foundation/v_colors.dart';
 import '../../foundation/v_radius.dart';
 
+/// Dropdown item definition for [VDropdown].
 class VDropdownItem<T> {
+  /// Underlying value for the item.
   final T value;
+
+  /// Label text shown when [child] is not provided.
   final String label;
+
+  /// Optional custom widget for the item.
   final Widget? child;
 
+  /// Creates a [VDropdownItem].
   const VDropdownItem({
     required this.value,
     required this.label,
@@ -14,21 +21,42 @@ class VDropdownItem<T> {
   });
 }
 
+/// A styled dropdown form field.
 class VDropdown<T> extends StatelessWidget {
+  /// Items available in the dropdown.
   final List<VDropdownItem<T>> items;
+
+  /// Currently selected value.
   final T? value;
+
+  /// Called when the selection changes.
   final ValueChanged<T?>? onChanged;
 
+  /// Label text displayed above the field.
   final String? label;
+
+  /// Hint text displayed when no selection is made.
   final String? hint;
+
+  /// Error text shown below the field.
   final String? errorText;
 
+  /// Whether the field is enabled.
   final bool enabled;
+
+  /// Whether the field is filled.
   final bool filled;
+
+  /// Radius token or identifier resolved by [VRadius].
   final Object? radius;
+
+  /// Explicit radius override when not using a token.
   final double? radiusValue;
+
+  /// Padding inside the field.
   final EdgeInsetsGeometry? contentPadding;
 
+  /// Creates a [VDropdown].
   const VDropdown({
     super.key,
     required this.items,
@@ -60,7 +88,7 @@ class VDropdown<T> extends StatelessWidget {
     );
 
     return DropdownButtonFormField<T>(
-      value: value,
+      initialValue: value,
       items: items
           .map(
             (item) => DropdownMenuItem<T>(
@@ -76,7 +104,7 @@ class VDropdown<T> extends StatelessWidget {
         errorText: errorText,
         isDense: true,
         filled: filled,
-        fillColor: enabled ? cs.surface : cs.surface.withOpacity(0.4),
+        fillColor: enabled ? cs.surface : cs.surface.withValues(alpha: 0.4),
         contentPadding:
             contentPadding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         border: border,

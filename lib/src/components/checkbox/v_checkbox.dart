@@ -2,14 +2,27 @@ import 'package:flutter/material.dart';
 import '../../foundation/v_colors.dart';
 import '../../foundation/v_radius.dart';
 
+/// A styled checkbox with optional rounded corners.
 class VCheckbox extends StatelessWidget {
+  /// Whether the checkbox is checked.
   final bool value;
+
+  /// Called when the user toggles the checkbox.
   final ValueChanged<bool>? onChanged;
+
+  /// Whether the checkbox is interactive.
   final bool enabled;
+
+  /// Width and height of the checkbox square.
   final double size;
+
+  /// Radius token or identifier resolved by [VRadius].
   final Object? radius;
+
+  /// Explicit radius override when not using a token.
   final double? radiusValue;
 
+  /// Creates a [VCheckbox].
   const VCheckbox({
     super.key,
     required this.value,
@@ -42,9 +55,9 @@ class VCheckbox extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: enabled ? bgColor : cs.onSurface.withOpacity(0.12),
+          color: enabled ? bgColor : cs.onSurface.withValues(alpha: 0.12),
           border: Border.all(
-            color: enabled ? borderColor : cs.onSurface.withOpacity(0.38),
+            color: enabled ? borderColor : cs.onSurface.withValues(alpha: 0.38),
           ),
           borderRadius: borderRadius,
         ),
@@ -52,7 +65,7 @@ class VCheckbox extends StatelessWidget {
             ? Icon(
                 Icons.check,
                 size: size * 0.7,
-                color: enabled ? iconColor : cs.onSurface.withOpacity(0.38),
+                color: enabled ? iconColor : cs.onSurface.withValues(alpha: 0.38),
               )
             : null,
       ),

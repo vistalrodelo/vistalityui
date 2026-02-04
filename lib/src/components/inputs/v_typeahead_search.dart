@@ -3,22 +3,51 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../textbox/v_textbox.dart';
 
+/// Search box with typeahead suggestions.
 class VTypeaheadSearchBox extends StatefulWidget {
+  /// Static list of options to search.
   final List<String> options;
+
+  /// Synchronous options builder for a query.
   final Iterable<String> Function(String query)? optionsBuilder;
+
+  /// Asynchronous options builder for a query.
   final Future<List<String>> Function(String query)? asyncOptionsBuilder;
+
+  /// Debounce duration for async queries.
   final Duration debounce;
+
+  /// Text shown while loading async options.
   final String? loadingText;
+
+  /// Text shown when no results are available.
   final String? emptyText;
+
+  /// Text shown on async error.
   final String? errorText;
+
+  /// Called when an option is selected.
   final ValueChanged<String>? onSelected;
+
+  /// Optional controller for the input.
   final TextEditingController? controller;
+
+  /// Optional focus node for the input.
   final FocusNode? focusNode;
+
+  /// Label text displayed above the field.
   final String? label;
+
+  /// Hint text displayed when empty.
   final String? hint;
+
+  /// Optional prefix icon.
   final Object? prefixIcon;
+
+  /// Optional suffix icon.
   final Object? suffixIcon;
 
+  /// Creates a [VTypeaheadSearchBox].
   const VTypeaheadSearchBox({
     super.key,
     required this.options,

@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
 import '../../foundation/v_colors.dart';
 
+/// A themed icon-only button.
 class VIconButton extends StatelessWidget {
+  /// Icon to display.
   final IconData icon;
+
+  /// Called when the button is pressed.
   final VoidCallback? onPressed;
+
+  /// Tooltip shown on long-press/hover.
   final String? tooltip;
+
+  /// Icon size in logical pixels.
   final double size;
+
+  /// Whether the button is enabled.
   final bool enabled;
 
+  /// Creates a [VIconButton].
   const VIconButton({
     super.key,
     required this.icon,
@@ -26,7 +37,7 @@ class VIconButton extends StatelessWidget {
       icon: Icon(icon, size: size),
       tooltip: tooltip,
       color: vc.primary,
-      disabledColor: cs.onSurface.withOpacity(0.38),
+      disabledColor: cs.onSurface.withValues(alpha: 0.38),
       onPressed: enabled ? onPressed : null,
     );
   }

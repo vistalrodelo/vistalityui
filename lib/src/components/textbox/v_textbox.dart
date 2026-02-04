@@ -3,45 +3,102 @@ import 'package:flutter/services.dart';
 import '../../foundation/v_colors.dart';
 import '../../foundation/v_radius.dart';
 
+/// A styled text input with optional validation and overlays.
 class VTextBox extends StatelessWidget {
+  /// Controller that holds the current text value.
   final TextEditingController controller;
+
+  /// Optional focus node for external focus control.
   final FocusNode? focusNode;
 
+  /// Label displayed above the input.
   final String? label;
+
+  /// Hint text displayed when empty.
   final String? hint;
+
+  /// Error text shown below the input.
   final String? errorText;
 
+  /// Whether the input is enabled.
   final bool enabled;
+
+  /// Whether the input is read-only.
   final bool readOnly;
+
+  /// Whether to obscure the text (password fields).
   final bool obscureText;
+
+  /// Whether to enable autocorrect.
   final bool autocorrect;
+
+  /// Whether to enable suggestions.
   final bool enableSuggestions;
+
+  /// Whether the input has a filled background.
   final bool filled;
+
+  /// Whether the input supports multiple lines.
   final bool multiline;
+
+  /// Whether to show a "new line" overlay button.
   final bool allowNewLineButton;
+
+  /// Whether to show a clear overlay button.
   final bool allowClearButton;
 
+  /// Maximum number of lines to display.
   final int? maxLines;
+
+  /// Minimum number of lines to display.
   final int? minLines;
+
+  /// Maximum character length.
   final int? maxLength;
+
+  /// Validation callback for the current value.
   final String? Function(String value)? validator;
+
+  /// Input formatters applied to the text field.
   final List<TextInputFormatter>? inputFormatters;
 
+  /// Keyboard type to use for the field.
   final TextInputType? keyboardType;
+
+  /// Action button for the keyboard.
   final TextInputAction? textInputAction;
+
+  /// Text capitalization behavior.
   final TextCapitalization textCapitalization;
 
+  /// Optional prefix icon (widget or IconData).
   final Object? prefixIcon;
+
+  /// Optional suffix icon (widget or IconData).
   final Object? suffixIcon;
+
+  /// Padding inside the input field.
   final EdgeInsetsGeometry? contentPadding;
+
+  /// Radius token or identifier resolved by [VRadius].
   final Object? radius;
+
+  /// Explicit radius override when not using a token.
   final double? radiusValue;
 
+  /// Called when the text changes.
   final ValueChanged<String>? onChanged;
+
+  /// Called when the user submits the field.
   final ValueChanged<String>? onSubmitted;
+
+  /// Called when editing completes.
   final VoidCallback? onEditingComplete;
+
+  /// Called when the field is tapped.
   final VoidCallback? onTap;
 
+  /// Creates a [VTextBox] with styling and validation options.
   const VTextBox({
     super.key,
     required this.controller,
@@ -82,7 +139,7 @@ class VTextBox extends StatelessWidget {
     if (validator != null && errorText == null) {
       return ValueListenableBuilder<TextEditingValue>(
         valueListenable: controller,
-        builder: (context, _, __) {
+        builder: (context, _, _) {
           final validationError = validator!(controller.text);
           return _buildTextField(context, validationError);
         },
@@ -153,7 +210,7 @@ class VTextBox extends StatelessWidget {
         suffixIcon: _resolveIcon(suffixIcon),
         isDense: true,
         filled: filled,
-        fillColor: enabled ? cs.surface : cs.surface.withOpacity(0.4),
+        fillColor: enabled ? cs.surface : cs.surface.withValues(alpha: 0.4),
         contentPadding: resolvedPadding,
         border: border,
         enabledBorder: border,
@@ -237,6 +294,7 @@ class VTextBox extends StatelessWidget {
     onChanged?.call('');
   }
 
+  /// Runs the validator against the current value.
   String? validate() {
     if (validator == null) return null;
     return validator!(controller.text);

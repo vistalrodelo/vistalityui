@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
 import '../../foundation/v_colors.dart';
 
+/// A themed range slider with two handles.
 class VRangeSlider extends StatelessWidget {
+  /// Current range values.
   final RangeValues values;
+
+  /// Called when the range changes.
   final ValueChanged<RangeValues>? onChanged;
+
+  /// Minimum value.
   final double min;
+
+  /// Maximum value.
   final double max;
+
+  /// Optional number of discrete divisions.
   final int? divisions;
+
+  /// Whether the slider is enabled.
   final bool enabled;
 
+  /// Creates a [VRangeSlider].
   const VRangeSlider({
     super.key,
     required this.values,
@@ -35,7 +48,7 @@ class VRangeSlider extends StatelessWidget {
       divisions: divisions,
       onChanged: enabled ? onChanged : null,
       activeColor: vc.primary,
-      inactiveColor: cs.onSurface.withOpacity(0.12),
+      inactiveColor: cs.onSurface.withValues(alpha: 0.12),
     );
   }
 }

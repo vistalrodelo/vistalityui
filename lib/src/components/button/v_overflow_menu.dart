@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import '../../foundation/v_colors.dart';
 
+/// Item definition for [VOverflowMenu].
 class VOverflowItem {
+  /// Label shown in the overflow menu.
   final String label;
+
+  /// Called when this item is selected.
   final VoidCallback? onSelected;
 
+  /// Creates a [VOverflowItem].
   const VOverflowItem({required this.label, this.onSelected});
 }
 
+/// Overflow menu with a list of selectable items.
 class VOverflowMenu extends StatelessWidget {
+  /// Menu items to display.
   final List<VOverflowItem> items;
 
+  /// Creates a [VOverflowMenu].
   const VOverflowMenu({super.key, required this.items});
 
   @override

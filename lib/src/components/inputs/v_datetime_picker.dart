@@ -1,15 +1,30 @@
 import 'package:flutter/material.dart';
 import '../textbox/v_textbox.dart';
 
+/// Read-only text field that picks date and time.
 class VDateTimePickerField extends StatelessWidget {
+  /// Currently selected date time.
   final DateTime? value;
+
+  /// Called when the value changes.
   final ValueChanged<DateTime?>? onChanged;
+
+  /// Controller for the input display.
   final TextEditingController controller;
+
+  /// Optional label text.
   final String? label;
+
+  /// Optional hint text.
   final String? hint;
+
+  /// Optional prefix icon.
   final Object? prefixIcon;
+
+  /// Optional suffix icon.
   final Object? suffixIcon;
 
+  /// Creates a [VDateTimePickerField].
   const VDateTimePickerField({
     super.key,
     required this.controller,
@@ -45,6 +60,7 @@ class VDateTimePickerField extends StatelessWidget {
           onChanged?.call(null);
           return;
         }
+        if (!context.mounted) return;
         final pickedTime = await showTimePicker(
           context: context,
           initialTime: TimeOfDay.fromDateTime(value ?? now),
@@ -53,6 +69,7 @@ class VDateTimePickerField extends StatelessWidget {
           onChanged?.call(null);
           return;
         }
+        if (!context.mounted) return;
         final combined = DateTime(
           pickedDate.year,
           pickedDate.month,

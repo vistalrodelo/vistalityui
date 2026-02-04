@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'v_overflow_menu.dart';
 
+/// Horizontal toolbar row with optional overflow actions.
 class VToolbarActions extends StatelessWidget {
+  /// Primary action widgets to display.
   final List<Widget> actions;
+
+  /// Spacing between actions.
   final double spacing;
+
+  /// Alignment for the row.
   final MainAxisAlignment alignment;
+
+  /// Optional overflow items appended at the end.
   final List<VOverflowItem>? overflowItems;
 
+  /// Creates a [VToolbarActions] row.
   const VToolbarActions({
     super.key,
     required this.actions,

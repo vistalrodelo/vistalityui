@@ -5,11 +5,18 @@ import '../button/v_button.dart';
 import '../checkbox/v_checkbox.dart';
 import '../../foundation/v_intent.dart';
 
+/// Multi-select item definition for [VMultiSelectDropdown].
 class VMultiSelectItem<T> {
+  /// Underlying value for the item.
   final T value;
+
+  /// Label text shown when [child] is not provided.
   final String label;
+
+  /// Optional custom widget for the item.
   final Widget? child;
 
+  /// Creates a [VMultiSelectItem].
   const VMultiSelectItem({
     required this.value,
     required this.label,
@@ -17,21 +24,42 @@ class VMultiSelectItem<T> {
   });
 }
 
+/// A multi-select dropdown using a dialog and checkboxes.
 class VMultiSelectDropdown<T> extends StatelessWidget {
+  /// Items available in the dropdown.
   final List<VMultiSelectItem<T>> items;
+
+  /// Currently selected values.
   final List<T> values;
+
+  /// Called when the selection changes.
   final ValueChanged<List<T>>? onChanged;
 
+  /// Label text displayed above the field.
   final String? label;
+
+  /// Hint text displayed when no selection is made.
   final String? hint;
+
+  /// Error text shown below the field.
   final String? errorText;
 
+  /// Whether the field is enabled.
   final bool enabled;
+
+  /// Whether the field is filled.
   final bool filled;
+
+  /// Radius token or identifier resolved by [VRadius].
   final Object? radius;
+
+  /// Explicit radius override when not using a token.
   final double? radiusValue;
+
+  /// Padding inside the field.
   final EdgeInsetsGeometry? contentPadding;
 
+  /// Creates a [VMultiSelectDropdown].
   const VMultiSelectDropdown({
     super.key,
     required this.items,
@@ -78,7 +106,7 @@ class VMultiSelectDropdown<T> extends StatelessWidget {
           hintText: hint,
           errorText: errorText,
           filled: filled,
-          fillColor: enabled ? cs.surface : cs.surface.withOpacity(0.4),
+          fillColor: enabled ? cs.surface : cs.surface.withValues(alpha: 0.4),
           contentPadding:
               contentPadding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           border: border,

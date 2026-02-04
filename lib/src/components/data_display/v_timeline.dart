@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../foundation/v_colors.dart';
 
+/// Timeline item data for [VTimeline].
 class VTimelineItem {
+  /// Item title.
   final String title;
+
+  /// Item subtitle.
   final String subtitle;
+
+  /// Optional time label.
   final String? time;
 
+  /// Creates a [VTimelineItem].
   const VTimelineItem({
     required this.title,
     required this.subtitle,
@@ -13,9 +20,12 @@ class VTimelineItem {
   });
 }
 
+/// Vertical timeline layout.
 class VTimeline extends StatelessWidget {
+  /// Items to display in the timeline.
   final List<VTimelineItem> items;
 
+  /// Creates a [VTimeline].
   const VTimeline({super.key, required this.items});
 
   @override
@@ -42,7 +52,7 @@ class VTimeline extends StatelessWidget {
                   ),
                 ),
                 if (!isLast)
-                  Container(width: 2, height: 40, color: cs.onSurface.withOpacity(0.12)),
+                  Container(width: 2, height: 40, color: cs.onSurface.withValues(alpha: 0.12)),
               ],
             ),
             const SizedBox(width: 12),

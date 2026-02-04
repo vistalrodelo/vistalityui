@@ -2,16 +2,33 @@ import 'package:flutter/material.dart';
 import '../textbox/v_textbox.dart';
 import 'v_chip.dart';
 
+/// Input that collects multiple string values as chips.
 class VChipsInput extends StatelessWidget {
+  /// Current chip values.
   final List<String> values;
+
+  /// Called when the values change.
   final ValueChanged<List<String>>? onChanged;
+
+  /// Controller for the input value.
   final TextEditingController controller;
+
+  /// Optional label text.
   final String? label;
+
+  /// Optional hint text.
   final String? hint;
+
+  /// Optional prefix icon.
   final Object? prefixIcon;
+
+  /// Optional suffix icon.
   final Object? suffixIcon;
+
+  /// Whether the input is enabled.
   final bool enabled;
 
+  /// Creates a [VChipsInput].
   const VChipsInput({
     super.key,
     required this.values,

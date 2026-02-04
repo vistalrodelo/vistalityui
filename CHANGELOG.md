@@ -4,3 +4,8 @@
 
 ## 0.0.2
 * Clean up
+
+
+## 1.0.0
+* Add documentation comment
+* Refactor deprecated method references

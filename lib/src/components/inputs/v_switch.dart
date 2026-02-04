@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
 import '../../foundation/v_colors.dart';
 
+/// A themed switch with optional label.
 class VSwitch extends StatelessWidget {
+  /// Current switch value.
   final bool value;
+
+  /// Called when the switch toggles.
   final ValueChanged<bool>? onChanged;
+
+  /// Whether the switch is enabled.
   final bool enabled;
+
+  /// Optional label text.
   final String? label;
+
+  /// Optional custom label widget.
   final Widget? child;
 
+  /// Creates a [VSwitch].
   const VSwitch({
     super.key,
     required this.value,
@@ -26,9 +37,9 @@ class VSwitch extends StatelessWidget {
     final switcher = Switch(
       value: value,
       onChanged: enabled ? onChanged : null,
-      activeColor: vc.primary,
-      inactiveThumbColor: cs.onSurface.withOpacity(0.4),
-      inactiveTrackColor: cs.onSurface.withOpacity(0.12),
+      activeThumbColor: vc.primary,
+      inactiveThumbColor: cs.onSurface.withValues(alpha: 0.4),
+      inactiveTrackColor: cs.onSurface.withValues(alpha: 0.12),
     );
 
     final labelWidget = child ?? (label != null ? Text(label!) : null);

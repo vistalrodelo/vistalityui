@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import '../../foundation/v_intent.dart';
 import 'v_button.dart';
 
+/// Convenience button for the primary intent.
 class VPrimaryButton extends StatelessWidget {
+  /// Button label text.
   final String label;
+
+  /// Called when the button is pressed.
   final VoidCallback? onPressed;
+
+  /// Creates a [VPrimaryButton].
   const VPrimaryButton({super.key, required this.label, required this.onPressed});
 
   @override
@@ -13,9 +19,15 @@ class VPrimaryButton extends StatelessWidget {
   }
 }
 
+/// Convenience button for the secondary intent.
 class VSecondaryButton extends StatelessWidget {
+  /// Button label text.
   final String label;
+
+  /// Called when the button is pressed.
   final VoidCallback? onPressed;
+
+  /// Creates a [VSecondaryButton].
   const VSecondaryButton({super.key, required this.label, required this.onPressed});
 
   @override
@@ -24,9 +36,15 @@ class VSecondaryButton extends StatelessWidget {
   }
 }
 
+/// Convenience button for the ghost variant.
 class VGhostButton extends StatelessWidget {
+  /// Button label text.
   final String label;
+
+  /// Called when the button is pressed.
   final VoidCallback? onPressed;
+
+  /// Creates a [VGhostButton].
   const VGhostButton({super.key, required this.label, required this.onPressed});
 
   @override
@@ -40,9 +58,15 @@ class VGhostButton extends StatelessWidget {
   }
 }
 
+/// Convenience button for the danger intent.
 class VDestructiveButton extends StatelessWidget {
+  /// Button label text.
   final String label;
+
+  /// Called when the button is pressed.
   final VoidCallback? onPressed;
+
+  /// Creates a [VDestructiveButton].
   const VDestructiveButton({super.key, required this.label, required this.onPressed});
 
   @override
@@ -51,9 +75,15 @@ class VDestructiveButton extends StatelessWidget {
   }
 }
 
+/// Convenience button that shows a loading spinner.
 class VLoadingButton extends StatelessWidget {
+  /// Button label text.
   final String label;
+
+  /// Called when the button is pressed.
   final VoidCallback? onPressed;
+
+  /// Creates a [VLoadingButton].
   const VLoadingButton({super.key, required this.label, required this.onPressed});
 
   @override
@@ -62,8 +92,12 @@ class VLoadingButton extends StatelessWidget {
   }
 }
 
+/// Convenience button in a disabled state.
 class VDisabledButton extends StatelessWidget {
+  /// Button label text.
   final String label;
+
+  /// Creates a [VDisabledButton].
   const VDisabledButton({super.key, required this.label});
 
   @override

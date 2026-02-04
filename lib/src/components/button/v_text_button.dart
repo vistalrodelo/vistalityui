@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'v_button.dart';
 
+/// Text-only button variant using [VButtonVariant.text].
 class VTextActionButton extends StatelessWidget {
+  /// Button label text.
   final String label;
+
+  /// Called when the button is pressed.
   final VoidCallback? onPressed;
+
+  /// Whether the button is enabled.
   final bool enabled;
 
+  /// Creates a [VTextActionButton].
   const VTextActionButton({
     super.key,
     required this.label,

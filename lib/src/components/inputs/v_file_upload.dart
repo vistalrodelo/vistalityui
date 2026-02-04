@@ -5,14 +5,27 @@ import 'package:flutter/material.dart';
 import '../button/v_button.dart';
 import '../../foundation/v_radius.dart';
 
+/// File picker with optional previews.
 class VFileUpload extends StatefulWidget {
+  /// Label for the upload button.
   final String label;
+
+  /// Whether the picker is enabled.
   final bool enabled;
+
+  /// Whether multiple files can be selected.
   final bool allowMultiple;
+
+  /// Optional list of allowed MIME groups.
   final List<XTypeGroup>? allowedTypes;
+
+  /// Called when files are selected.
   final ValueChanged<List<XFile>>? onChanged;
+
+  /// Maximum bytes to preview for images.
   final int maxPreviewBytes;
 
+  /// Creates a [VFileUpload].
   const VFileUpload({
     super.key,
     this.label = 'Upload file',

@@ -2,16 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../foundation/v_radius.dart';
 
+/// One-time passcode input with multiple boxes.
 class VOtpInput extends StatefulWidget {
+  /// Optional controllers for each digit.
   final List<TextEditingController>? controllers;
+
+  /// Optional focus nodes for each digit.
   final List<FocusNode>? focusNodes;
+
+  /// Number of digits in the OTP.
   final int length;
+
+  /// Called when the value changes.
   final ValueChanged<String>? onChanged;
+
+  /// Called when the value is completed.
   final ValueChanged<String>? onCompleted;
+
+  /// Whether to auto-submit on completion.
   final bool autoSubmit;
+
+  /// Whether the input is enabled.
   final bool enabled;
+
+  /// Size of each digit box.
   final double size;
 
+  /// Creates a [VOtpInput].
   const VOtpInput({
     super.key,
     this.controllers,

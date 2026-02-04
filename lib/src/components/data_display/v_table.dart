@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
+/// Simple wrapper around [DataTable].
 class VDataTable extends StatelessWidget {
+  /// Column definitions.
   final List<DataColumn> columns;
+
+  /// Row definitions.
   final List<DataRow> rows;
 
+  /// Creates a [VDataTable].
   const VDataTable({
     super.key,
     required this.columns,
@@ -16,12 +21,21 @@ class VDataTable extends StatelessWidget {
   }
 }
 
+/// [DataTable] with sorting configuration.
 class VSortableTable extends StatelessWidget {
+  /// Column definitions.
   final List<DataColumn> columns;
+
+  /// Row definitions.
   final List<DataRow> rows;
+
+  /// Column index being sorted.
   final int? sortColumnIndex;
+
+  /// Whether sort is ascending.
   final bool sortAscending;
 
+  /// Creates a [VSortableTable].
   const VSortableTable({
     super.key,
     required this.columns,
@@ -41,12 +55,21 @@ class VSortableTable extends StatelessWidget {
   }
 }
 
+/// [DataTable] with a text filter input.
 class VFilterableTable extends StatelessWidget {
+  /// Column definitions.
   final List<DataColumn> columns;
+
+  /// Row definitions.
   final List<DataRow> rows;
+
+  /// Current filter text.
   final String filterText;
+
+  /// Called when the filter changes.
   final ValueChanged<String> onFilterChanged;
 
+  /// Creates a [VFilterableTable].
   const VFilterableTable({
     super.key,
     required this.columns,
@@ -71,11 +94,18 @@ class VFilterableTable extends StatelessWidget {
   }
 }
 
+/// Paginated table built on [PaginatedDataTable].
 class VPaginatedTable extends StatelessWidget {
+  /// Column definitions.
   final List<DataColumn> columns;
+
+  /// Data source for rows.
   final DataTableSource source;
+
+  /// Rows per page.
   final int rowsPerPage;
 
+  /// Creates a [VPaginatedTable].
   const VPaginatedTable({
     super.key,
     required this.columns,
@@ -93,10 +123,15 @@ class VPaginatedTable extends StatelessWidget {
   }
 }
 
+/// Editable table constructed from widget cells.
 class VEditableTable extends StatelessWidget {
+  /// Column definitions.
   final List<DataColumn> columns;
+
+  /// Row widget cells.
   final List<List<Widget>> rows;
 
+  /// Creates a [VEditableTable].
   const VEditableTable({
     super.key,
     required this.columns,
@@ -116,10 +151,15 @@ class VEditableTable extends StatelessWidget {
   }
 }
 
+/// Table with a custom sticky header row.
 class VStickyHeaderTable extends StatelessWidget {
+  /// Header labels.
   final List<String> headers;
+
+  /// Row cell values.
   final List<List<String>> rows;
 
+  /// Creates a [VStickyHeaderTable].
   const VStickyHeaderTable({
     super.key,
     required this.headers,

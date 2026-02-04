@@ -2,12 +2,21 @@ import 'package:flutter/material.dart';
 import '../../foundation/v_colors.dart';
 import '../../foundation/v_radius.dart';
 
+/// A styled accordion built on top of `ExpansionTile`.
 class VAccordion extends StatelessWidget {
+  /// Header text shown in the accordion tile.
   final String title;
+
+  /// The widget displayed when the accordion is expanded.
   final Widget child;
+
+  /// Whether the accordion starts expanded.
   final bool initiallyExpanded;
+
+  /// Optional leading widget shown before the title.
   final Widget? leading;
 
+  /// Creates a [VAccordion] with a title and expandable content.
   const VAccordion({
     super.key,
     required this.title,

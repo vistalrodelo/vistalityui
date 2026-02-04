@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import '../../foundation/v_colors.dart';
 import '../../foundation/v_radius.dart';
 
+/// Base card container with border and padding.
 class VCard extends StatelessWidget {
+  /// Child widget inside the card.
   final Widget child;
+
+  /// Inner padding for the card.
   final EdgeInsetsGeometry padding;
 
+  /// Creates a [VCard].
   const VCard({
     super.key,
     required this.child,
@@ -29,11 +34,18 @@ class VCard extends StatelessWidget {
   }
 }
 
+/// Card that displays a media image with text.
 class VMediaCard extends StatelessWidget {
+  /// Title text.
   final String title;
+
+  /// Subtitle text.
   final String subtitle;
+
+  /// Image provider for the media.
   final ImageProvider image;
 
+  /// Creates a [VMediaCard].
   const VMediaCard({
     super.key,
     required this.title,
@@ -60,11 +72,18 @@ class VMediaCard extends StatelessWidget {
   }
 }
 
+/// Card with description and action widgets.
 class VActionCard extends StatelessWidget {
+  /// Title text.
   final String title;
+
+  /// Description text.
   final String description;
+
+  /// Action widgets shown at the bottom.
   final List<Widget> actions;
 
+  /// Creates a [VActionCard].
   const VActionCard({
     super.key,
     required this.title,
@@ -89,11 +108,18 @@ class VActionCard extends StatelessWidget {
   }
 }
 
+/// Card displaying an avatar with name and subtitle.
 class VProfileCard extends StatelessWidget {
+  /// Profile name.
   final String name;
+
+  /// Subtitle text.
   final String subtitle;
+
+  /// Avatar image provider.
   final ImageProvider avatar;
 
+  /// Creates a [VProfileCard].
   const VProfileCard({
     super.key,
     required this.name,
@@ -121,11 +147,18 @@ class VProfileCard extends StatelessWidget {
   }
 }
 
+/// Card showing a stat value with an optional change.
 class VStatsCard extends StatelessWidget {
+  /// Label for the stat.
   final String label;
+
+  /// Value for the stat.
   final String value;
+
+  /// Optional change indicator text.
   final String? change;
 
+  /// Creates a [VStatsCard].
   const VStatsCard({
     super.key,
     required this.label,
@@ -152,11 +185,18 @@ class VStatsCard extends StatelessWidget {
   }
 }
 
+/// Card tile with an icon and two lines of text.
 class VDashboardTile extends StatelessWidget {
+  /// Title text.
   final String title;
+
+  /// Subtitle text.
   final String subtitle;
+
+  /// Icon displayed on the left.
   final IconData icon;
 
+  /// Creates a [VDashboardTile].
   const VDashboardTile({
     super.key,
     required this.title,

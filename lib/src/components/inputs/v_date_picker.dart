@@ -1,17 +1,36 @@
 import 'package:flutter/material.dart';
 import '../textbox/v_textbox.dart';
 
+/// Read-only text field that opens a date picker.
 class VDatePickerField extends StatelessWidget {
+  /// Currently selected date.
   final DateTime? value;
+
+  /// Called when the date changes.
   final ValueChanged<DateTime?>? onChanged;
+
+  /// Controller for the input display.
   final TextEditingController controller;
+
+  /// Optional label text.
   final String? label;
+
+  /// Optional hint text.
   final String? hint;
+
+  /// Optional prefix icon.
   final Object? prefixIcon;
+
+  /// Optional suffix icon.
   final Object? suffixIcon;
+
+  /// Earliest selectable date.
   final DateTime? firstDate;
+
+  /// Latest selectable date.
   final DateTime? lastDate;
 
+  /// Creates a [VDatePickerField].
   const VDatePickerField({
     super.key,
     required this.controller,

@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
 import '../../foundation/v_colors.dart';
 
+/// Star rating control.
 class VRating extends StatelessWidget {
+  /// Current rating value.
   final int value;
+
+  /// Called when the rating changes.
   final ValueChanged<int>? onChanged;
+
+  /// Maximum rating value.
   final int max;
+
+  /// Icon size.
   final double size;
+
+  /// Whether the control is enabled.
   final bool enabled;
 
+  /// Creates a [VRating].
   const VRating({
     super.key,
     required this.value,
@@ -33,7 +44,7 @@ class VRating extends StatelessWidget {
           icon: Icon(
             filled ? Icons.star : Icons.star_border,
             size: size,
-            color: filled ? vc.primary : cs.onSurface.withOpacity(0.4),
+            color: filled ? vc.primary : cs.onSurface.withValues(alpha: 0.4),
           ),
           onPressed: enabled ? () => onChanged?.call(index + 1) : null,
         );

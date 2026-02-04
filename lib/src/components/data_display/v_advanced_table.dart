@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../foundation/v_colors.dart';
 
+/// Table with filtering, sorting, and pagination.
 class VAdvancedTable extends StatefulWidget {
+  /// Column header labels.
   final List<String> headers;
+
+  /// Row values as strings.
   final List<List<String>> rows;
+
+  /// Rows per page.
   final int rowsPerPage;
 
+  /// Creates a [VAdvancedTable].
   const VAdvancedTable({
     super.key,
     required this.headers,

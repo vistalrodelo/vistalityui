@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 
+/// Tree node model for [VTreeView].
 class VTreeNode {
+  /// Node label text.
   final String label;
+
+  /// Child nodes.
   final List<VTreeNode> children;
+
+  /// Whether the node is expanded.
   final bool expanded;
 
+  /// Creates a [VTreeNode].
   const VTreeNode({
     required this.label,
     this.children = const [],
@@ -12,10 +19,15 @@ class VTreeNode {
   });
 }
 
+/// Read-only tree view for nested data.
 class VTreeView extends StatelessWidget {
+  /// Root nodes to display.
   final List<VTreeNode> nodes;
+
+  /// Indent size per depth level.
   final double indent;
 
+  /// Creates a [VTreeView].
   const VTreeView({
     super.key,
     required this.nodes,

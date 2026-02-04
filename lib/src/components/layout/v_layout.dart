@@ -1,19 +1,42 @@
 import 'package:flutter/material.dart';
 import '../../foundation/v_radius.dart';
 
+/// Container helper with optional padding, margin, and radius.
 class VBox extends StatelessWidget {
+  /// Child widget inside the box.
   final Widget? child;
+
+  /// Inner padding of the box.
   final EdgeInsetsGeometry? padding;
+
+  /// Outer margin of the box.
   final EdgeInsetsGeometry? margin;
+
+  /// Background color of the box.
   final Color? color;
+
+  /// Border for the box.
   final Border? border;
+
+  /// Shadow list for the box.
   final List<BoxShadow>? shadow;
+
+  /// Radius token or identifier resolved by [VRadius].
   final Object? radius;
+
+  /// Explicit radius override when not using a token.
   final double? radiusValue;
+
+  /// Fixed width for the box.
   final double? width;
+
+  /// Fixed height for the box.
   final double? height;
+
+  /// Alignment for the child.
   final AlignmentGeometry? alignment;
 
+  /// Creates a [VBox].
   const VBox({
     super.key,
     this.child,
@@ -53,9 +76,15 @@ class VBox extends StatelessWidget {
   }
 }
 
+/// Wrapper around [Padding].
 class VPadding extends StatelessWidget {
+  /// Padding to apply.
   final EdgeInsetsGeometry padding;
+
+  /// Child widget.
   final Widget child;
+
+  /// Creates a [VPadding].
   const VPadding({super.key, required this.padding, required this.child});
 
   @override
@@ -64,8 +93,12 @@ class VPadding extends StatelessWidget {
   }
 }
 
+/// Square spacer with identical width and height.
 class VSpacer extends StatelessWidget {
+  /// Size for both width and height.
   final double size;
+
+  /// Creates a [VSpacer].
   const VSpacer(this.size, {super.key});
 
   @override
@@ -74,9 +107,15 @@ class VSpacer extends StatelessWidget {
   }
 }
 
+/// Horizontal divider with optional thickness and color.
 class VDivider extends StatelessWidget {
+  /// Thickness of the divider.
   final double thickness;
+
+  /// Divider color.
   final Color? color;
+
+  /// Creates a [VDivider].
   const VDivider({super.key, this.thickness = 1, this.color});
 
   @override
@@ -85,13 +124,24 @@ class VDivider extends StatelessWidget {
   }
 }
 
+/// Row with optional spacing between children.
 class VRow extends StatelessWidget {
+  /// Widgets to display in a row.
   final List<Widget> children;
+
+  /// Spacing between children.
   final double spacing;
+
+  /// Main axis alignment.
   final MainAxisAlignment mainAxisAlignment;
+
+  /// Cross axis alignment.
   final CrossAxisAlignment crossAxisAlignment;
+
+  /// Main axis size.
   final MainAxisSize mainAxisSize;
 
+  /// Creates a [VRow].
   const VRow({
     super.key,
     required this.children,
@@ -112,13 +162,24 @@ class VRow extends StatelessWidget {
   }
 }
 
+/// Column with optional spacing between children.
 class VColumn extends StatelessWidget {
+  /// Widgets to display in a column.
   final List<Widget> children;
+
+  /// Spacing between children.
   final double spacing;
+
+  /// Main axis alignment.
   final MainAxisAlignment mainAxisAlignment;
+
+  /// Cross axis alignment.
   final CrossAxisAlignment crossAxisAlignment;
+
+  /// Main axis size.
   final MainAxisSize mainAxisSize;
 
+  /// Creates a [VColumn].
   const VColumn({
     super.key,
     required this.children,
@@ -139,10 +200,18 @@ class VColumn extends StatelessWidget {
   }
 }
 
+/// Wrapper around [Wrap] with spacing controls.
 class VWrap extends StatelessWidget {
+  /// Widgets to display.
   final List<Widget> children;
+
+  /// Spacing between children.
   final double spacing;
+
+  /// Spacing between runs.
   final double runSpacing;
+
+  /// Creates a [VWrap].
   const VWrap({
     super.key,
     required this.children,
@@ -156,9 +225,15 @@ class VWrap extends StatelessWidget {
   }
 }
 
+/// Stack with configurable alignment.
 class VStack extends StatelessWidget {
+  /// Widgets to overlay.
   final List<Widget> children;
+
+  /// Alignment for the stack.
   final AlignmentGeometry alignment;
+
+  /// Creates a [VStack].
   const VStack({
     super.key,
     required this.children,
@@ -171,15 +246,30 @@ class VStack extends StatelessWidget {
   }
 }
 
+/// Grid view with fixed column count.
 class VGrid extends StatelessWidget {
+  /// Widgets to display in the grid.
   final List<Widget> children;
+
+  /// Number of columns.
   final int columns;
+
+  /// Spacing between columns.
   final double spacing;
+
+  /// Spacing between rows.
   final double runSpacing;
+
+  /// Aspect ratio for grid children.
   final double childAspectRatio;
+
+  /// Scroll physics for the grid.
   final ScrollPhysics? physics;
+
+  /// Whether the grid shrinks to fit content.
   final bool shrinkWrap;
 
+  /// Creates a [VGrid].
   const VGrid({
     super.key,
     required this.children,
@@ -205,9 +295,15 @@ class VGrid extends StatelessWidget {
   }
 }
 
+/// Wrapper around [AspectRatio].
 class VAspect extends StatelessWidget {
+  /// Desired aspect ratio.
   final double ratio;
+
+  /// Child widget.
   final Widget child;
+
+  /// Creates a [VAspect].
   const VAspect({super.key, required this.ratio, required this.child});
 
   @override
@@ -216,8 +312,12 @@ class VAspect extends StatelessWidget {
   }
 }
 
+/// Wrapper around [SafeArea].
 class VSafeArea extends StatelessWidget {
+  /// Child widget.
   final Widget child;
+
+  /// Creates a [VSafeArea].
   const VSafeArea({super.key, required this.child});
 
   @override
@@ -226,8 +326,12 @@ class VSafeArea extends StatelessWidget {
   }
 }
 
+/// Wrapper around [Center].
 class VCenter extends StatelessWidget {
+  /// Child widget.
   final Widget child;
+
+  /// Creates a [VCenter].
   const VCenter({super.key, required this.child});
 
   @override
@@ -236,9 +340,15 @@ class VCenter extends StatelessWidget {
   }
 }
 
+/// Wrapper around [Align].
 class VAlign extends StatelessWidget {
+  /// Alignment to apply.
   final AlignmentGeometry alignment;
+
+  /// Child widget.
   final Widget child;
+
+  /// Creates a [VAlign].
   const VAlign({super.key, required this.alignment, required this.child});
 
   @override
@@ -247,9 +357,15 @@ class VAlign extends StatelessWidget {
   }
 }
 
+/// Wrapper around [ConstrainedBox].
 class VConstrainedBox extends StatelessWidget {
+  /// Constraints to apply.
   final BoxConstraints constraints;
+
+  /// Child widget.
   final Widget child;
+
+  /// Creates a [VConstrainedBox].
   const VConstrainedBox({super.key, required this.constraints, required this.child});
 
   @override
@@ -258,9 +374,15 @@ class VConstrainedBox extends StatelessWidget {
   }
 }
 
+/// Wrapper around [SingleChildScrollView].
 class VScrollView extends StatelessWidget {
+  /// Scroll direction.
   final Axis direction;
+
+  /// Child widget.
   final Widget child;
+
+  /// Creates a [VScrollView].
   const VScrollView({super.key, this.direction = Axis.vertical, required this.child});
 
   @override

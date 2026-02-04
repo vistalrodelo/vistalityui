@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 
+/// Expansion panel item data.
 class VExpansionItem {
+  /// Header text for the panel.
   final String header;
+
+  /// Body widget shown when expanded.
   final Widget body;
+
+  /// Whether the panel is expanded.
   final bool expanded;
 
+  /// Creates a [VExpansionItem].
   const VExpansionItem({
     required this.header,
     required this.body,
@@ -12,10 +19,15 @@ class VExpansionItem {
   });
 }
 
+/// Expansion panel list built from [VExpansionItem]s.
 class VExpansionPanelList extends StatelessWidget {
+  /// Items to display.
   final List<VExpansionItem> items;
+
+  /// Called when a panel is toggled.
   final ValueChanged<int>? onToggle;
 
+  /// Creates a [VExpansionPanelList].
   const VExpansionPanelList({
     super.key,
     required this.items,

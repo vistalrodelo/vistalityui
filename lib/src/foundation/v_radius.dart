@@ -2,16 +2,40 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-enum VRadiusSize { none, sm, md, lg }
+/// Supported radius sizes for rounded corners.
+enum VRadiusSize {
+  /// No rounding.
+  none,
 
+  /// Small radius.
+  sm,
+
+  /// Medium radius.
+  md,
+
+  /// Large radius.
+  lg,
+}
+
+/// Theme extension for standard corner radii.
 @immutable
 class VRadius extends ThemeExtension<VRadius> {
+  /// Default radius size token.
   final VRadiusSize defaultSize;
+
+  /// Radius value for [VRadiusSize.none].
   final double none;
+
+  /// Radius value for [VRadiusSize.sm].
   final double sm;
+
+  /// Radius value for [VRadiusSize.md].
   final double md;
+
+  /// Radius value for [VRadiusSize.lg].
   final double lg;
 
+  /// Creates a [VRadius] set with explicit values.
   const VRadius({
     required this.defaultSize,
     required this.none,
@@ -20,6 +44,7 @@ class VRadius extends ThemeExtension<VRadius> {
     required this.lg,
   });
 
+  /// Returns the default radius values.
   factory VRadius.defaults() => const VRadius(
     defaultSize: VRadiusSize.md,
     none: 0,
@@ -28,6 +53,7 @@ class VRadius extends ThemeExtension<VRadius> {
     lg: 16,
   );
 
+  /// Resolves a numeric radius for a given [VRadiusSize].
   double value(VRadiusSize size) {
     switch (size) {
       case VRadiusSize.none:
@@ -41,10 +67,16 @@ class VRadius extends ThemeExtension<VRadius> {
     }
   }
 
+  /// Creates a border radius for the given size.
   BorderRadius borderRadius(VRadiusSize size) => BorderRadius.circular(value(size));
+
+  /// Creates a border radius for the default size.
   BorderRadius defaultBorderRadius() => borderRadius(defaultSize);
+
+  /// Creates a border radius for an explicit radius value.
   BorderRadius borderRadiusValue(double radius) => BorderRadius.circular(radius);
 
+  /// Resolves a border radius from a token or explicit value.
   BorderRadius resolveBorderRadius({
     Object? radius,
     double? radiusValue,
@@ -91,7 +123,9 @@ class VRadius extends ThemeExtension<VRadius> {
   }
 }
 
+/// Convenience accessors for [VRadius].
 extension VRadiusX on BuildContext {
+  /// Returns the [VRadius] extension from the current theme.
   VRadius get vRadius =>
       Theme.of(this).extension<VRadius>() ?? VRadius.defaults();
 }

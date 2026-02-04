@@ -7,21 +7,42 @@ import '../dropdown/v_multi_select_dropdown.dart';
 import '../radio/v_radio.dart';
 import '../textbox/v_textbox.dart';
 
+/// Supported form field types for [VFormFieldConfig].
 enum VFormFieldType {
+  /// Single-line text input.
   text,
+
+  /// Multiline text input.
   multiline,
+
+  /// Password input.
   password,
+
+  /// Single-select dropdown.
   dropdown,
+
+  /// Multi-select dropdown.
   multiselect,
+
+  /// Checkbox input.
   checkbox,
+
+  /// Radio group input.
   radio,
 }
 
+/// Radio option definition for [VForm].
 class VRadioOption<T> {
+  /// Underlying value for the option.
   final T value;
+
+  /// Label text shown when [child] is not provided.
   final String label;
+
+  /// Optional custom widget for the option.
   final Widget? child;
 
+  /// Creates a [VRadioOption].
   const VRadioOption({
     required this.value,
     required this.label,
@@ -29,33 +50,78 @@ class VRadioOption<T> {
   });
 }
 
+/// Configuration model for a field rendered by [VForm].
 class VFormFieldConfig<T> {
+  /// Unique identifier for the field.
   final String id;
+
+  /// Field type that controls rendering.
   final VFormFieldType type;
+
+  /// Label shown for the field.
   final String label;
+
+  /// Optional hint text.
   final String? hint;
+
+  /// Whether the field is required.
   final bool required;
+
+  /// Whether the field is enabled.
   final bool enabled;
 
+  /// Optional controller for text-based fields.
   final TextEditingController? controller;
+
+  /// Initial text for text-based fields.
   final String? initialText;
+
+  /// Whether a clear button is shown for text fields.
   final bool allowClearButton;
+
+  /// Whether a new line button is shown for multiline fields.
   final bool allowNewLineButton;
+
+  /// Maximum character length for text fields.
   final int? maxLength;
+
+  /// Keyboard type for text fields.
   final TextInputType? keyboardType;
+
+  /// Keyboard action for text fields.
   final TextInputAction? textInputAction;
+
+  /// Optional prefix icon.
   final Object? prefixIcon;
+
+  /// Optional suffix icon.
   final Object? suffixIcon;
 
+  /// Items for dropdown fields.
   final List<VDropdownItem<T>>? items;
+
+  /// Items for multi-select fields.
   final List<VMultiSelectItem<T>>? multiItems;
+
+  /// Options for radio fields.
   final List<VRadioOption<T>>? radioOptions;
+
+  /// Initial value for single-choice fields.
   final T? initialValue;
+
+  /// Initial values for multi-select fields.
   final List<T>? initialValues;
+
+  /// Validation for text fields.
   final String? Function(String value)? validator;
+
+  /// Validation for non-text fields.
   final String? Function(Object? value)? validatorAny;
+
+  /// Initial value for checkbox fields.
   final bool? checkboxInitialValue;
 
+  /// Internal constructor for shared field settings.
   VFormFieldConfig._({
     required this.id,
     required this.type,
@@ -82,6 +148,7 @@ class VFormFieldConfig<T> {
     this.checkboxInitialValue,
   });
 
+  /// Creates a text field configuration.
   VFormFieldConfig.text({
     required String id,
     required String label,
@@ -115,6 +182,7 @@ class VFormFieldConfig<T> {
           validator: validator,
         );
 
+  /// Creates a multiline text field configuration.
   VFormFieldConfig.multiline({
     required String id,
     required String label,
@@ -146,6 +214,7 @@ class VFormFieldConfig<T> {
           validator: validator,
         );
 
+  /// Creates a password field configuration.
   VFormFieldConfig.password({
     required String id,
     required String label,
@@ -173,6 +242,7 @@ class VFormFieldConfig<T> {
           validator: validator,
         );
 
+  /// Creates a dropdown field configuration.
   VFormFieldConfig.dropdown({
     required String id,
     required String label,
@@ -194,6 +264,7 @@ class VFormFieldConfig<T> {
           validatorAny: validator == null ? null : (v) => validator(v is T ? v : null),
         );
 
+  /// Creates a multi-select field configuration.
   VFormFieldConfig.multiselect({
     required String id,
     required String label,
@@ -217,6 +288,7 @@ class VFormFieldConfig<T> {
               : (v) => validator(v is List<T> ? v : List<T>.from(v as List)),
         );
 
+  /// Creates a checkbox field configuration.
   VFormFieldConfig.checkbox({
     required String id,
     required String label,
@@ -234,6 +306,7 @@ class VFormFieldConfig<T> {
           validatorAny: validator == null ? null : (v) => validator(v is bool ? v : false),
         );
 
+  /// Creates a radio field configuration.
   VFormFieldConfig.radio({
     required String id,
     required String label,
@@ -254,17 +327,33 @@ class VFormFieldConfig<T> {
         );
 }
 
+/// Signature for form submission callbacks.
 typedef VFormSubmit = void Function(Map<String, dynamic> values);
 
+/// Responsive form builder based on a list of field configs.
 class VForm extends StatefulWidget {
+  /// Field configurations to render.
   final List<VFormFieldConfig> fields;
+
+  /// Number of columns to use for layout.
   final int columns;
+
+  /// Spacing between fields.
   final double spacing;
+
+  /// Label for the submit button.
   final String submitLabel;
+
+  /// Label for the cancel button.
   final String cancelLabel;
+
+  /// Optional cancel callback.
   final VoidCallback? onCancel;
+
+  /// Optional submit callback with collected values.
   final VFormSubmit? onSubmit;
 
+  /// Creates a [VForm].
   const VForm({
     super.key,
     required this.fields,

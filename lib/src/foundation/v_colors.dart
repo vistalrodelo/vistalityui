@@ -1,29 +1,61 @@
 import 'package:flutter/material.dart';
 
+/// Theme extension that carries custom color roles for Vistality UI.
 @immutable
 class VColors extends ThemeExtension<VColors> {
   // Instance fields (not static)
+  /// Primary brand color.
   final Color primary;
+
+  /// Foreground color on [primary].
   final Color onPrimary;
+
+  /// Container color for primary surfaces.
   final Color primaryContainer;
+
+  /// Foreground color on [primaryContainer].
   final Color onPrimaryContainer;
 
+  /// Secondary color for accents.
   final Color secondary;
+
+  /// Foreground color on [secondary].
   final Color onSecondary;
+
+  /// Tertiary color for accents.
   final Color tertiary;
+
+  /// Foreground color on [tertiary].
   final Color onTertiary;
 
+  /// Surface color for cards and sheets.
   final Color surface;
+
+  /// Foreground color on [surface].
   final Color onSurface;
+
+  /// Background color for app scaffolds.
   final Color background;
+
+  /// Foreground color on [background].
   final Color onBackground;
+
+  /// Outline color for borders.
   final Color outline;
 
+  /// Error color.
   final Color error;
+
+  /// Foreground color on [error].
   final Color onError;
+
+  /// Container color for error surfaces.
   final Color errorContainer;
+
+  /// Foreground color on [errorContainer].
   final Color onErrorContainer;
 
+  /// Creates a [VColors] palette.
   const VColors({
     required this.primary,
     required this.onPrimary,
@@ -44,6 +76,7 @@ class VColors extends ThemeExtension<VColors> {
     required this.onErrorContainer,
   });
 
+  /// Creates a [VColors] palette from a [ColorScheme].
   factory VColors.fromScheme(ColorScheme s) => VColors(
     primary: s.primary,
     onPrimary: s.onPrimary,
@@ -55,7 +88,7 @@ class VColors extends ThemeExtension<VColors> {
     onTertiary: s.onTertiary,
     surface: s.surface,
     onSurface: s.onSurface,
-    background: s.background,
+    background: s.surface,
     onBackground: s.onSurface,
     outline: s.outline,
     error: s.error,
@@ -64,6 +97,7 @@ class VColors extends ThemeExtension<VColors> {
     onErrorContainer: s.onErrorContainer,
   );
 
+  /// Creates a [VColors] palette from a seed color and brightness.
   static VColors fromSeed(Color seed, Brightness brightness) =>
       VColors.fromScheme(ColorScheme.fromSeed(seedColor: seed, brightness: brightness));
 
@@ -133,7 +167,9 @@ class VColors extends ThemeExtension<VColors> {
   }
 }
 
+/// Convenience accessors for [VColors].
 extension VColorsX on BuildContext {
+  /// Returns the closest [VColors] from the current theme.
   VColors get vColors =>
       Theme.of(this).extension<VColors>() ??
           VColors.fromScheme(Theme.of(this).colorScheme);
