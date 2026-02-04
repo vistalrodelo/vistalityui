@@ -203,7 +203,7 @@ class VMultiSelectDropdown<T> extends StatelessWidget {
         field,
         const SizedBox(height: 2),
         Text(
-          resolvedErrorText!,
+          resolvedErrorText,
           style: TextStyle(
             color: vc.error,
             fontSize: 12,

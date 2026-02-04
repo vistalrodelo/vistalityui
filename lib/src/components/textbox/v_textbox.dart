@@ -288,7 +288,7 @@ class VTextBox extends StatelessWidget {
         fieldContent,
         const SizedBox(height: 2),
         Text(
-          resolvedErrorText!,
+          resolvedErrorText,
           style: TextStyle(
             color: vc.error,
             fontSize: 12,

@@ -161,9 +161,9 @@ class VAutoSizer extends StatelessWidget {
     }
     final minWidth = minItemWidth!;
     final estimated = ((width + spacing) / (minWidth + spacing)).floor();
-    final safeEstimated = estimated.clamp(1, 1000) as int;
+    final safeEstimated = estimated.clamp(1, 1000);
     final cappedMax = maxColumns == null ? safeEstimated : maxColumns!;
-    final columns = safeEstimated.clamp(minColumns, cappedMax) as int;
+    final columns = safeEstimated.clamp(minColumns, cappedMax);
     final itemWidth = (width - (columns - 1) * spacing) / columns;
 
     return children
