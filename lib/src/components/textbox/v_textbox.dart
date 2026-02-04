@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../foundation/v_control_sizes.dart';
 import '../../foundation/v_colors.dart';
 import '../../foundation/v_radius.dart';
 
@@ -80,6 +81,12 @@ class VTextBox extends StatelessWidget {
   /// Padding inside the input field.
   final EdgeInsetsGeometry? contentPadding;
 
+  /// Optional height override for single-line fields.
+  final double? controlHeight;
+
+  /// Whether to show error text below the field.
+  final bool showErrorText;
+
   /// Radius token or identifier resolved by [VRadius].
   final Object? radius;
 
@@ -126,6 +133,8 @@ class VTextBox extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.contentPadding,
+    this.controlHeight,
+    this.showErrorText = true,
     this.radius,
     this.radiusValue,
     this.onChanged,
@@ -183,6 +192,15 @@ class VTextBox extends StatelessWidget {
           )
         : basePadding;
 
+    final resolvedHeight =
+        multiline ? null : (controlHeight ?? VControlSizes.fieldHeight);
+    final iconConstraints = resolvedHeight == null
+        ? null
+        : BoxConstraints(
+            minHeight: resolvedHeight,
+            minWidth: resolvedHeight,
+          );
+    final hasError = resolvedErrorText != null && resolvedErrorText.isNotEmpty;
     final textField = TextField(
       controller: controller,
       focusNode: focusNode,
@@ -198,6 +216,8 @@ class VTextBox extends StatelessWidget {
       keyboardType: resolvedKeyboardType,
       textInputAction: resolvedTextInputAction,
       textCapitalization: textCapitalization,
+      textAlignVertical:
+          resolvedHeight == null ? null : TextAlignVertical.center,
       onChanged: onChanged,
       onSubmitted: onSubmitted,
       onEditingComplete: onEditingComplete,
@@ -205,9 +225,14 @@ class VTextBox extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        errorText: resolvedErrorText,
+        errorText: hasError ? '' : null,
+        errorStyle: hasError
+            ? const TextStyle(fontSize: 0, height: 0)
+            : null,
         prefixIcon: _resolveIcon(prefixIcon),
         suffixIcon: _resolveIcon(suffixIcon),
+        prefixIconConstraints: iconConstraints,
+        suffixIconConstraints: iconConstraints,
         isDense: true,
         filled: filled,
         fillColor: enabled ? cs.surface : cs.surface.withValues(alpha: 0.4),
@@ -226,24 +251,49 @@ class VTextBox extends StatelessWidget {
       ),
     );
 
-    if (!hasOverlayActions) return textField;
+    Widget fieldContent = textField;
+    if (hasOverlayActions) {
+      fieldContent = Stack(
+        fit: StackFit.passthrough,
+        children: [
+          textField,
+          if (allowClearButton)
+            Positioned(
+              top: 6,
+              right: 6,
+              child: _buildClearIcon(),
+            ),
+          if (allowNewLineButton)
+            Positioned(
+              bottom: 6,
+              right: 6,
+              child: _buildNewLineIcon(),
+            ),
+        ],
+      );
+    }
 
-    return Stack(
-      fit: StackFit.passthrough,
+    if (resolvedHeight != null) {
+      fieldContent = SizedBox(
+        height: resolvedHeight,
+        child: SizedBox.expand(child: fieldContent),
+      );
+    }
+
+    if (!hasError || !showErrorText) return fieldContent;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        textField,
-        if (allowClearButton)
-          Positioned(
-            top: 6,
-            right: 6,
-            child: _buildClearIcon(),
+        fieldContent,
+        const SizedBox(height: 2),
+        Text(
+          resolvedErrorText!,
+          style: TextStyle(
+            color: vc.error,
+            fontSize: 12,
           ),
-        if (allowNewLineButton)
-          Positioned(
-            bottom: 6,
-            right: 6,
-            child: _buildNewLineIcon(),
-          ),
+        ),
       ],
     );
   }

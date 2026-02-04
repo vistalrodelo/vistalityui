@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../foundation/v_breakpoints.dart';
+import '../../foundation/v_control_sizes.dart';
 import '../../foundation/v_intent.dart';
 import '../button/v_button.dart';
 import '../checkbox/v_checkbox.dart';
@@ -415,9 +417,10 @@ class _VFormState extends State<VForm> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final columns = widget.columns.clamp(1, 4);
-        final spacing = widget.spacing;
+        final maxColumns = widget.columns.clamp(1, 4);
         final width = constraints.maxWidth;
+        final columns = _resolveColumns(width, maxColumns);
+        final spacing = widget.spacing;
         final itemWidth = (width - spacing * (columns - 1)) / columns;
 
         return Column(
@@ -439,11 +442,13 @@ class _VFormState extends State<VForm> {
                 VButton(
                   label: widget.cancelLabel,
                   intent: VIntent.secondary,
+                  size: VButtonSize.sm,
                   onPressed: widget.onCancel ?? () {},
                 ),
                 const SizedBox(width: 12),
                 VButton(
                   label: widget.submitLabel,
+                  size: VButtonSize.sm,
                   onPressed: _handleSubmit,
                 ),
               ],
@@ -454,9 +459,20 @@ class _VFormState extends State<VForm> {
     );
   }
 
+  int _resolveColumns(double width, int maxColumns) {
+    if (width < VBreakpoints.md) {
+      return 1;
+    }
+    if (width < VBreakpoints.lg) {
+      return maxColumns.clamp(1, 2);
+    }
+    return maxColumns;
+  }
+
   Widget _buildField(VFormFieldConfig field) {
     final error = _errors[field.id];
-    switch (field.type) {
+    final fieldWidget = () {
+      switch (field.type) {
       case VFormFieldType.text:
       case VFormFieldType.multiline:
       case VFormFieldType.password:
@@ -466,6 +482,7 @@ class _VFormState extends State<VForm> {
           label: _label(field),
           hint: field.hint,
           errorText: error,
+          showErrorText: false,
           enabled: field.enabled,
           multiline: field.type == VFormFieldType.multiline,
           obscureText: field.type == VFormFieldType.password,
@@ -476,6 +493,9 @@ class _VFormState extends State<VForm> {
           textInputAction: field.textInputAction,
           prefixIcon: field.prefixIcon,
           suffixIcon: field.suffixIcon,
+          controlHeight: field.type == VFormFieldType.multiline
+              ? null
+              : VControlSizes.fieldHeight,
           onChanged: (value) {
             _values[field.id] = value;
             _clearError(field.id);
@@ -489,6 +509,8 @@ class _VFormState extends State<VForm> {
           items: field.items ?? const [],
           enabled: field.enabled,
           errorText: error,
+          showErrorText: false,
+          controlHeight: VControlSizes.fieldHeight,
           onChanged: (value) {
             setState(() {
               _values[field.id] = value;
@@ -504,6 +526,8 @@ class _VFormState extends State<VForm> {
           items: field.multiItems ?? const [],
           enabled: field.enabled,
           errorText: error,
+          showErrorText: false,
+          controlHeight: VControlSizes.fieldHeight,
           onChanged: (values) {
             setState(() {
               _values[field.id] = values;
@@ -533,10 +557,6 @@ class _VFormState extends State<VForm> {
                 Text(_label(field)),
               ],
             ),
-            if (error != null) ...[
-              const SizedBox(height: 6),
-              Text(error, style: const TextStyle(color: Colors.red)),
-            ],
           ],
         );
       case VFormFieldType.radio:
@@ -564,13 +584,47 @@ class _VFormState extends State<VForm> {
                 ),
               ),
             ),
-            if (error != null) ...[
-              const SizedBox(height: 6),
-              Text(error, style: const TextStyle(color: Colors.red)),
-            ],
           ],
         );
     }
+    }();
+
+    final fieldHeight = switch (field.type) {
+      VFormFieldType.text => VControlSizes.fieldHeight,
+      VFormFieldType.password => VControlSizes.fieldHeight,
+      VFormFieldType.dropdown => VControlSizes.fieldHeight,
+      VFormFieldType.multiselect => null,
+      _ => null,
+    };
+
+    return _wrapWithErrorSlot(fieldWidget, error, fieldHeight: fieldHeight);
+  }
+
+  Widget _wrapWithErrorSlot(
+    Widget field,
+    String? error, {
+    double? fieldHeight,
+  }) {
+    final sizedField = fieldHeight == null
+        ? field
+        : SizedBox(height: fieldHeight, child: field);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        sizedField,
+        const SizedBox(height: 2),
+        SizedBox(
+          height: 16,
+          child: error == null
+              ? null
+              : Text(
+                  error,
+                  style: const TextStyle(color: Colors.red, fontSize: 12),
+                  overflow: TextOverflow.ellipsis,
+                ),
+        ),
+      ],
+    );
   }
 
   void _handleSubmit() {

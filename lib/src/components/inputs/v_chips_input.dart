@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../textbox/v_textbox.dart';
 import 'v_chip.dart';
+import '../../foundation/v_control_sizes.dart';
 
 /// Input that collects multiple string values as chips.
 class VChipsInput extends StatelessWidget {
@@ -25,6 +26,12 @@ class VChipsInput extends StatelessWidget {
   /// Optional suffix icon.
   final Object? suffixIcon;
 
+  /// Optional height override for the input field.
+  final double? controlHeight;
+
+  /// Spacing between the input and chip list.
+  final double chipsSpacing;
+
   /// Whether the input is enabled.
   final bool enabled;
 
@@ -38,6 +45,8 @@ class VChipsInput extends StatelessWidget {
     this.hint,
     this.prefixIcon,
     this.suffixIcon,
+    this.controlHeight,
+    this.chipsSpacing = 8,
     this.enabled = true,
   });
 
@@ -52,21 +61,24 @@ class VChipsInput extends StatelessWidget {
           hint: hint ?? 'Add a tag',
           prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
+          controlHeight: controlHeight ?? VControlSizes.fieldHeight,
           enabled: enabled,
           textInputAction: TextInputAction.done,
           onSubmitted: (_) => _addTag(),
         ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: values
-              .map((v) => VChip(
-                    label: v,
-                    onDeleted: enabled ? () => _removeTag(v) : null,
-                  ))
-              .toList(),
-        ),
+        if (values.isNotEmpty) ...[
+          SizedBox(height: chipsSpacing),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: values
+                .map((v) => VChip(
+                      label: v,
+                      onDeleted: enabled ? () => _removeTag(v) : null,
+                    ))
+                .toList(),
+          ),
+        ],
       ],
     );
   }

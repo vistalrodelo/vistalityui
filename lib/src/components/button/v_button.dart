@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../foundation/v_control_sizes.dart';
 import '../../foundation/v_intent.dart';
 import '../../foundation/v_radius.dart';
 import 'v_button_style.dart';
@@ -59,6 +60,9 @@ class VButton extends StatelessWidget {
   /// Whether the button stretches to fill available width.
   final bool fullWidth;
 
+  /// Optional height override for the button.
+  final double? height;
+
   /// Whether to show a loading spinner and disable the button.
   final bool loading;
 
@@ -75,6 +79,7 @@ class VButton extends StatelessWidget {
     this.leading,
     this.trailing,
     this.fullWidth = false,
+    this.height,
     this.loading = false,
   });
 
@@ -89,6 +94,17 @@ class VButton extends StatelessWidget {
         return const EdgeInsets.symmetric(horizontal: 24, vertical: 16);
       case VButtonSize.md:
         return const EdgeInsets.symmetric(horizontal: 16, vertical: 12);
+    }
+  }
+
+  double get _defaultHeight {
+    switch (size) {
+      case VButtonSize.sm:
+        return VControlSizes.buttonSm;
+      case VButtonSize.lg:
+        return VControlSizes.buttonLg;
+      case VButtonSize.md:
+        return VControlSizes.buttonMd;
     }
   }
 
@@ -107,20 +123,23 @@ class VButton extends StatelessWidget {
 
     return SizedBox(
       width: fullWidth ? double.infinity : null,
-      child: Material(
-        color: style.background,
-        borderRadius: radius,
-        child: InkWell(
-          onTap: enabled ? onPressed : null,
+      child: ConstrainedBox(
+        constraints: BoxConstraints.tightFor(height: height ?? _defaultHeight),
+        child: Material(
+          color: style.background,
           borderRadius: radius,
-          child: Container(
-            padding: _padding,
-            decoration: BoxDecoration(
-              border: Border.all(color: style.border),
-              borderRadius: radius,
+          child: InkWell(
+            onTap: enabled ? onPressed : null,
+            borderRadius: radius,
+            child: Container(
+              padding: _padding,
+              decoration: BoxDecoration(
+                border: Border.all(color: style.border),
+                borderRadius: radius,
+              ),
+              alignment: Alignment.center,
+              child: _buildContent(style),
             ),
-            alignment: Alignment.center,
-            child: _buildContent(style),
           ),
         ),
       ),
