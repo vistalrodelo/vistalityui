@@ -620,23 +620,23 @@ class _SelectedFile {
 class _CheckerboardPainter extends CustomPainter {
   final Color light;
   final Color dark;
-  final double squareSize;
+  final double _squareSize = 8;
 
   const _CheckerboardPainter({
     required this.light,
     required this.dark,
-    this.squareSize = 8,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final paintLight = Paint()..color = light;
     final paintDark = Paint()..color = dark;
-    for (double y = 0; y < size.height; y += squareSize) {
-      for (double x = 0; x < size.width; x += squareSize) {
-        final isDark = ((x / squareSize).floor() + (y / squareSize).floor()) % 2 == 0;
+    for (double y = 0; y < size.height; y += _squareSize) {
+      for (double x = 0; x < size.width; x += _squareSize) {
+        final isDark =
+            ((x / _squareSize).floor() + (y / _squareSize).floor()) % 2 == 0;
         canvas.drawRect(
-          Rect.fromLTWH(x, y, squareSize, squareSize),
+          Rect.fromLTWH(x, y, _squareSize, _squareSize),
           isDark ? paintDark : paintLight,
         );
       }
@@ -645,8 +645,6 @@ class _CheckerboardPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _CheckerboardPainter oldDelegate) {
-    return oldDelegate.light != light ||
-        oldDelegate.dark != dark ||
-        oldDelegate.squareSize != squareSize;
+    return oldDelegate.light != light || oldDelegate.dark != dark;
   }
 }
