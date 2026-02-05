@@ -116,51 +116,6 @@ class _VFileUploadState extends State<VFileUpload> {
     return [file];
   }
 
-  Widget _buildFileInfo(_SelectedFile file, int index) {
-    final isImage = _isImage(file.file.name);
-    final size = file.size == null ? 'Unknown' : _formatBytes(file.size!);
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (isImage && file.bytes != null) ...[
-            ClipRRect(
-              borderRadius: context.vRadius.borderRadius(VRadiusSize.sm),
-              child: Image.memory(
-                file.bytes!,
-                width: 48,
-                height: 48,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(width: 10),
-          ],
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(file.file.name),
-                const SizedBox(height: 2),
-                Text(
-                  '${_extension(file.file.name)} • $size',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-          if (widget.allowRemove)
-            IconButton(
-              icon: const Icon(Icons.close),
-              tooltip: 'Remove',
-              onPressed: widget.enabled ? () => _removeFile(index) : null,
-            ),
-        ],
-      ),
-    );
-  }
-
   void _removeFile(int index) {
     final updated = List<_SelectedFile>.of(_files)..removeAt(index);
     _setSelectedFiles(updated);
@@ -431,6 +386,7 @@ class _VFileUploadState extends State<VFileUpload> {
     if (!_canCropFile(file)) return;
     final sourcePath = kIsWeb ? await _resolveWebSourcePath(file) : file.file.path;
     if (sourcePath == null || sourcePath.isEmpty) return;
+    if (!mounted) return;
     final updatedFile = await vCropImage(
       file: file.file,
       context: context,
@@ -669,6 +625,7 @@ class _CheckerboardPainter extends CustomPainter {
   const _CheckerboardPainter({
     required this.light,
     required this.dark,
+    this.squareSize = 8,
   });
 
   @override
