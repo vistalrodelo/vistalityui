@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:desktop_drop/desktop_drop.dart';
@@ -298,7 +297,7 @@ class _VFileUploadState extends State<VFileUpload> {
     final aspect = hasDimensions ? file.width! / file.height! : 1.0;
     return Container(
       decoration: BoxDecoration(
-        color: scheme.surfaceVariant,
+        color: scheme.surfaceContainerHighest,
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -315,7 +314,7 @@ class _VFileUploadState extends State<VFileUpload> {
               child: CustomPaint(
                 painter: _CheckerboardPainter(
                   light: scheme.surface,
-                  dark: scheme.surfaceVariant,
+                  dark: scheme.surfaceContainerHighest,
                 ),
                 child: Image.memory(
                   file.bytes!,
@@ -670,7 +669,6 @@ class _CheckerboardPainter extends CustomPainter {
   const _CheckerboardPainter({
     required this.light,
     required this.dark,
-    this.squareSize = 8,
   });
 
   @override
