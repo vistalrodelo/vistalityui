@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 import '../foundation/v_colors.dart';
 import '../foundation/v_radius.dart';
 
-/// Builds a Material 3 theme using a seed color and radius defaults.
+/// Builds a Material 3 theme using a seed color, radius defaults, and fonts.
 ThemeData buildTheme(
   Color seed, {
   Brightness brightness = Brightness.light,
   Object defaultRadius = VRadiusSize.md,
+  String? fontFamily,
+  List<String>? fontFamilyFallback,
+  String? defaultFontFamily,
+  TextTheme Function(TextTheme base)? textThemeBuilder,
 }) {
   final scheme = ColorScheme.fromSeed(seedColor: seed, brightness: brightness);
   final primary = seed;
@@ -21,7 +25,8 @@ ThemeData buildTheme(
   final dialogShape = RoundedRectangleBorder(
     borderRadius: vRadius.defaultBorderRadius(),
   );
-  return ThemeData(
+  final resolvedFontFamily = fontFamily ?? defaultFontFamily;
+  final baseTheme = ThemeData(
     useMaterial3: true,
     colorScheme: adjustedScheme,
     dialogTheme: DialogThemeData(shape: dialogShape),
@@ -32,6 +37,26 @@ ThemeData buildTheme(
       vRadius,
     ],
   );
+  ThemeData themed = baseTheme;
+  if (resolvedFontFamily != null || fontFamilyFallback != null) {
+    themed = themed.copyWith(
+      textTheme: themed.textTheme.apply(
+        fontFamily: resolvedFontFamily,
+        fontFamilyFallback: fontFamilyFallback,
+      ),
+      primaryTextTheme: themed.primaryTextTheme.apply(
+        fontFamily: resolvedFontFamily,
+        fontFamilyFallback: fontFamilyFallback,
+      ),
+    );
+  }
+  if (textThemeBuilder != null) {
+    themed = themed.copyWith(
+      textTheme: textThemeBuilder(themed.textTheme),
+      primaryTextTheme: textThemeBuilder(themed.primaryTextTheme),
+    );
+  }
+  return themed;
 }
 
 VRadius _buildVRadius(Object defaultRadius) {

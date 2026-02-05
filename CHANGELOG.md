@@ -13,3 +13,6 @@
 ## 1.0.1
 * Add autosizer component
 * Add default global component height
+
+## 1.0.2
+* Refine file picker component

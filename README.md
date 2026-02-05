@@ -41,11 +41,15 @@ class MyApp extends StatelessWidget {
         kBrandSeed,
         brightness: Brightness.light,
         defaultRadius: VRadiusSize.md,
+        fontFamily: 'Inter',
+        fontFamilyFallback: const ['Roboto', 'Arial'],
       ),
       darkTheme: buildTheme(
         kBrandSeed,
         brightness: Brightness.dark,
         defaultRadius: VRadiusSize.md,
+        fontFamily: 'Inter',
+        fontFamilyFallback: const ['Roboto', 'Arial'],
       ),
       themeMode: ThemeMode.system,
       home: const Scaffold(
@@ -67,6 +71,36 @@ You can set the default radius with `VRadiusSize` or a number:
 ```dart
 buildTheme(kBrandSeed, defaultRadius: VRadiusSize.md);
 buildTheme(kBrandSeed, defaultRadius: 24);
+```
+
+You can also set a global font and fallback list:
+
+```dart
+buildTheme(
+  kBrandSeed,
+  fontFamily: 'Inter',
+  fontFamilyFallback: const ['Roboto', 'Arial'],
+);
+```
+
+If you want a default font when `fontFamily` isn't set, use `defaultFontFamily`:
+
+```dart
+buildTheme(
+  kBrandSeed,
+  defaultFontFamily: 'Inter',
+);
+```
+
+You can also use Google Fonts by passing a text theme builder:
+
+```dart
+import 'package:google_fonts/google_fonts.dart';
+
+final theme = buildTheme(
+  kBrandSeed,
+  textThemeBuilder: GoogleFonts.interTextTheme,
+);
 ```
 
 Per-component overrides:
