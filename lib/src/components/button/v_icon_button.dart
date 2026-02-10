@@ -18,6 +18,11 @@ class VIconButton extends StatelessWidget {
   /// Whether the button is enabled.
   final bool enabled;
 
+  /// Optional color override for the icon when enabled.
+  ///
+  /// When not provided, the primary color from [VColors] is used.
+  final Color? color;
+
   /// Creates a [VIconButton].
   const VIconButton({
     super.key,
@@ -26,6 +31,7 @@ class VIconButton extends StatelessWidget {
     this.tooltip,
     this.size = 24,
     this.enabled = true,
+    this.color,
   });
 
   @override
@@ -36,7 +42,7 @@ class VIconButton extends StatelessWidget {
     return IconButton(
       icon: Icon(icon, size: size),
       tooltip: tooltip,
-      color: vc.primary,
+      color: color ?? vc.primary,
       disabledColor: cs.onSurface.withValues(alpha: 0.38),
       onPressed: enabled ? onPressed : null,
     );

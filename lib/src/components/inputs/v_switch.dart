@@ -18,6 +18,11 @@ class VSwitch extends StatelessWidget {
   /// Optional custom label widget.
   final Widget? child;
 
+  /// Optional active thumb color override.
+  ///
+  /// When not provided, the primary color from [VColors] is used.
+  final Color? activeColor;
+
   /// Creates a [VSwitch].
   const VSwitch({
     super.key,
@@ -26,6 +31,7 @@ class VSwitch extends StatelessWidget {
     this.enabled = true,
     this.label,
     this.child,
+    this.activeColor,
   });
 
   @override
@@ -37,7 +43,7 @@ class VSwitch extends StatelessWidget {
     final switcher = Switch(
       value: value,
       onChanged: enabled ? onChanged : null,
-      activeThumbColor: vc.primary,
+      activeThumbColor: activeColor ?? vc.primary,
       inactiveThumbColor: cs.onSurface.withValues(alpha: 0.4),
       inactiveTrackColor: cs.onSurface.withValues(alpha: 0.12),
     );

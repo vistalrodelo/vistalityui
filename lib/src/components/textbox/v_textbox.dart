@@ -105,6 +105,11 @@ class VTextBox extends StatelessWidget {
   /// Called when the field is tapped.
   final VoidCallback? onTap;
 
+  /// Optional focused border color override.
+  ///
+  /// When not provided, the primary color from [VColors] is used.
+  final Color? focusBorderColor;
+
   /// Creates a [VTextBox] with styling and validation options.
   const VTextBox({
     super.key,
@@ -141,6 +146,7 @@ class VTextBox extends StatelessWidget {
     this.onSubmitted,
     this.onEditingComplete,
     this.onTap,
+    this.focusBorderColor,
   });
 
   @override
@@ -240,7 +246,10 @@ class VTextBox extends StatelessWidget {
         border: border,
         enabledBorder: border,
         focusedBorder: border.copyWith(
-          borderSide: BorderSide(color: vc.primary, width: 2),
+          borderSide: BorderSide(
+            color: focusBorderColor ?? vc.primary,
+            width: 2,
+          ),
         ),
         errorBorder: border.copyWith(
           borderSide: BorderSide(color: vc.error),

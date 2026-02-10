@@ -21,6 +21,11 @@ class VRangeSlider extends StatelessWidget {
   /// Whether the slider is enabled.
   final bool enabled;
 
+  /// Optional active color override for the range slider.
+  ///
+  /// When not provided, the primary color from [VColors] is used.
+  final Color? activeColor;
+
   /// Creates a [VRangeSlider].
   const VRangeSlider({
     super.key,
@@ -30,6 +35,7 @@ class VRangeSlider extends StatelessWidget {
     this.max = 100,
     this.divisions,
     this.enabled = true,
+    this.activeColor,
   });
 
   @override
@@ -47,7 +53,7 @@ class VRangeSlider extends StatelessWidget {
       max: max,
       divisions: divisions,
       onChanged: enabled ? onChanged : null,
-      activeColor: vc.primary,
+      activeColor: activeColor ?? vc.primary,
       inactiveColor: cs.onSurface.withValues(alpha: 0.12),
     );
   }

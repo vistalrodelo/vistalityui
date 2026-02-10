@@ -15,6 +15,16 @@ class VFab extends StatelessWidget {
   /// Whether the button is enabled.
   final bool enabled;
 
+  /// Optional background color override.
+  ///
+  /// When not provided, the primary color from [VColors] is used.
+  final Color? backgroundColor;
+
+  /// Optional foreground (icon) color override.
+  ///
+  /// When not provided, the onPrimary color from [VColors] is used.
+  final Color? foregroundColor;
+
   /// Creates a [VFab].
   const VFab({
     super.key,
@@ -22,6 +32,8 @@ class VFab extends StatelessWidget {
     required this.onPressed,
     this.tooltip,
     this.enabled = true,
+    this.backgroundColor,
+    this.foregroundColor,
   });
 
   @override
@@ -32,8 +44,8 @@ class VFab extends StatelessWidget {
     return FloatingActionButton(
       onPressed: enabled ? onPressed : null,
       tooltip: tooltip,
-      backgroundColor: vc.primary,
-      foregroundColor: vc.onPrimary,
+      backgroundColor: backgroundColor ?? vc.primary,
+      foregroundColor: foregroundColor ?? vc.onPrimary,
       child: Icon(icon),
     );
   }

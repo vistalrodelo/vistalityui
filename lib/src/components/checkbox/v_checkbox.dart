@@ -22,6 +22,11 @@ class VCheckbox extends StatelessWidget {
   /// Explicit radius override when not using a token.
   final double? radiusValue;
 
+  /// Optional active color override for the checked state.
+  ///
+  /// When not provided, the primary color from [VColors] is used.
+  final Color? activeColor;
+
   /// Creates a [VCheckbox].
   const VCheckbox({
     super.key,
@@ -31,6 +36,7 @@ class VCheckbox extends StatelessWidget {
     this.size = 20,
     this.radius,
     this.radiusValue,
+    this.activeColor,
   });
 
   @override
@@ -43,8 +49,9 @@ class VCheckbox extends StatelessWidget {
       radiusValue: radiusValue,
     );
 
-    final bgColor = value ? vc.primary : Colors.transparent;
-    final borderColor = value ? vc.primary : vc.outline;
+    final primary = activeColor ?? vc.primary;
+    final bgColor = value ? primary : Colors.transparent;
+    final borderColor = value ? primary : vc.outline;
     final iconColor = vc.onPrimary;
 
     return InkWell(

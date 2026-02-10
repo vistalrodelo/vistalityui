@@ -35,16 +35,36 @@ class ExampleHomePage extends StatelessWidget {
         children: [
           const VHeading('Components', level: VHeadingLevel.h4),
           const SizedBox(height: 16),
-          VButton(
-            label: 'Primary action',
-            onPressed: () {},
-            leading: const Icon(Icons.flash_on),
+          const VHeading('Buttons', level: VHeadingLevel.h5),
+          const SizedBox(height: 8),
+          VButtonGroup(
+            children: [
+              VButton(
+                label: 'Primary action',
+                onPressed: () {},
+                leading: const Icon(Icons.flash_on),
+              ),
+              VButton(
+                label: 'Ghost button',
+                variant: VButtonVariant.ghost,
+                onPressed: () {},
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          VButton(
-            label: 'Ghost button',
-            variant: VButtonVariant.ghost,
-            onPressed: () {},
+          const SizedBox(height: 16),
+          const VHeading('Button overrides', level: VHeadingLevel.h5),
+          const SizedBox(height: 8),
+          VButtonGroup(
+            children: [
+              VButton(
+                label: 'Overridden colors',
+                onPressed: () {},
+                backgroundColor: Colors.amber,
+                foregroundColor: Colors.black,
+                borderColor: Colors.deepOrange,
+                leading: const Icon(Icons.color_lens),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
           VAccordion(

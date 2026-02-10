@@ -21,6 +21,11 @@ class VSlider extends StatelessWidget {
   /// Whether the slider is enabled.
   final bool enabled;
 
+  /// Optional active color override for the slider.
+  ///
+  /// When not provided, the primary color from [VColors] is used.
+  final Color? activeColor;
+
   /// Creates a [VSlider].
   const VSlider({
     super.key,
@@ -30,6 +35,7 @@ class VSlider extends StatelessWidget {
     this.max = 100,
     this.divisions,
     this.enabled = true,
+    this.activeColor,
   });
 
   @override
@@ -44,7 +50,7 @@ class VSlider extends StatelessWidget {
       max: max,
       divisions: divisions,
       onChanged: enabled ? onChanged : null,
-      activeColor: vc.primary,
+      activeColor: activeColor ?? vc.primary,
       inactiveColor: cs.onSurface.withValues(alpha: 0.12),
     );
   }

@@ -16,3 +16,6 @@
 
 ## 1.0.2
 * Refine file picker component
+
+## 1.0.3
+* Add color override option

@@ -35,6 +35,16 @@ class VSegmented<T> extends StatelessWidget {
   /// Whether the control is enabled.
   final bool enabled;
 
+  /// Optional background color override for the selected segment.
+  ///
+  /// When not provided, the primary color from [VColors] is used.
+  final Color? selectedColor;
+
+  /// Optional foreground color override for the selected segment.
+  ///
+  /// When not provided, the onPrimary color from [VColors] is used.
+  final Color? selectedForegroundColor;
+
   /// Creates a [VSegmented].
   const VSegmented({
     super.key,
@@ -42,6 +52,8 @@ class VSegmented<T> extends StatelessWidget {
     required this.onChanged,
     required this.options,
     this.enabled = true,
+    this.selectedColor,
+    this.selectedForegroundColor,
   });
 
   @override
@@ -67,11 +79,15 @@ class VSegmented<T> extends StatelessWidget {
           : null,
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return vc.primary;
+          if (states.contains(WidgetState.selected)) {
+            return selectedColor ?? vc.primary;
+          }
           return cs.surface;
         }),
         foregroundColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return vc.onPrimary;
+          if (states.contains(WidgetState.selected)) {
+            return selectedForegroundColor ?? vc.onPrimary;
+          }
           return cs.onSurface;
         }),
         side: WidgetStateProperty.all(BorderSide(color: vc.outline)),

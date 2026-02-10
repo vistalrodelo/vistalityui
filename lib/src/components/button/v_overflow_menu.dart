@@ -18,8 +18,17 @@ class VOverflowMenu extends StatelessWidget {
   /// Menu items to display.
   final List<VOverflowItem> items;
 
+  /// Optional color override for the overflow icon.
+  ///
+  /// When not provided, the primary color from [VColors] is used.
+  final Color? iconColor;
+
   /// Creates a [VOverflowMenu].
-  const VOverflowMenu({super.key, required this.items});
+  const VOverflowMenu({
+    super.key,
+    required this.items,
+    this.iconColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +37,7 @@ class VOverflowMenu extends StatelessWidget {
     final vc = theme.extension<VColors>() ?? VColors.fromScheme(cs);
 
     return PopupMenuButton<int>(
-      icon: Icon(Icons.more_vert, color: vc.primary),
+      icon: Icon(Icons.more_vert, color: iconColor ?? vc.primary),
       itemBuilder: (context) {
         return List.generate(items.length, (index) {
           final item = items[index];

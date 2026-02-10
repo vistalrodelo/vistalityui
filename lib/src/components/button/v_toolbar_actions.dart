@@ -15,6 +15,11 @@ class VToolbarActions extends StatelessWidget {
   /// Optional overflow items appended at the end.
   final List<VOverflowItem>? overflowItems;
 
+  /// Optional color override applied to the overflow menu icon.
+  ///
+  /// When not provided, the primary color from [VColors] is used.
+  final Color? overflowColor;
+
   /// Creates a [VToolbarActions] row.
   const VToolbarActions({
     super.key,
@@ -22,6 +27,7 @@ class VToolbarActions extends StatelessWidget {
     this.spacing = 8,
     this.alignment = MainAxisAlignment.start,
     this.overflowItems,
+    this.overflowColor,
   });
 
   @override
@@ -35,7 +41,12 @@ class VToolbarActions extends StatelessWidget {
     }
     if (overflowItems != null && overflowItems!.isNotEmpty) {
       if (children.isNotEmpty) children.add(SizedBox(width: spacing));
-      children.add(VOverflowMenu(items: overflowItems!));
+      children.add(
+        VOverflowMenu(
+          items: overflowItems!,
+          iconColor: overflowColor,
+        ),
+      );
     }
 
     return Row(

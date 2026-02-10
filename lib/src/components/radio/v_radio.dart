@@ -24,6 +24,12 @@ class VRadio<T> extends StatelessWidget {
   /// Optional custom label widget.
   final Widget? child;
 
+  /// Optional color override for the selected state.
+  ///
+  /// When provided, this color is used for the selected border and fill
+  /// instead of the primary color from [VColors].
+  final Color? activeColor;
+
   /// Creates a [VRadio].
   const VRadio({
     super.key,
@@ -34,6 +40,7 @@ class VRadio<T> extends StatelessWidget {
     this.size = 20,
     this.label,
     this.child,
+    this.activeColor,
   });
 
   bool get _selected => value == groupValue;
@@ -44,8 +51,9 @@ class VRadio<T> extends StatelessWidget {
     final cs = theme.colorScheme;
     final vc = theme.extension<VColors>() ?? VColors.fromScheme(cs);
 
-    final borderColor = _selected ? vc.primary : vc.outline;
-    final fillColor = _selected ? vc.primary : Colors.transparent;
+    final primary = activeColor ?? vc.primary;
+    final borderColor = _selected ? primary : vc.outline;
+    final fillColor = _selected ? primary : Colors.transparent;
     final dotColor = vc.onPrimary;
 
     final radio = InkWell(

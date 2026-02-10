@@ -25,8 +25,17 @@ class VTimeline extends StatelessWidget {
   /// Items to display in the timeline.
   final List<VTimelineItem> items;
 
+  /// Optional color override for the timeline indicator.
+  ///
+  /// When not provided, the primary color from [VColors] is used.
+  final Color? accentColor;
+
   /// Creates a [VTimeline].
-  const VTimeline({super.key, required this.items});
+  const VTimeline({
+    super.key,
+    required this.items,
+    this.accentColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +56,7 @@ class VTimeline extends StatelessWidget {
                   width: 10,
                   height: 10,
                   decoration: BoxDecoration(
-                    color: vc.primary,
+                    color: accentColor ?? vc.primary,
                     shape: BoxShape.circle,
                   ),
                 ),

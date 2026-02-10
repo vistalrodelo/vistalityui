@@ -10,12 +10,35 @@ class VPrimaryButton extends StatelessWidget {
   /// Called when the button is pressed.
   final VoidCallback? onPressed;
 
+  /// Optional background color override.
+  final Color? backgroundColor;
+
+  /// Optional foreground (text/icon) color override.
+  final Color? foregroundColor;
+
+  /// Optional border color override.
+  final Color? borderColor;
+
   /// Creates a [VPrimaryButton].
-  const VPrimaryButton({super.key, required this.label, required this.onPressed});
+  const VPrimaryButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.borderColor,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return VButton(label: label, intent: VIntent.primary, onPressed: onPressed);
+    return VButton(
+      label: label,
+      intent: VIntent.primary,
+      onPressed: onPressed,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      borderColor: borderColor,
+    );
   }
 }
 
@@ -27,12 +50,35 @@ class VSecondaryButton extends StatelessWidget {
   /// Called when the button is pressed.
   final VoidCallback? onPressed;
 
+  /// Optional background color override.
+  final Color? backgroundColor;
+
+  /// Optional foreground (text/icon) color override.
+  final Color? foregroundColor;
+
+  /// Optional border color override.
+  final Color? borderColor;
+
   /// Creates a [VSecondaryButton].
-  const VSecondaryButton({super.key, required this.label, required this.onPressed});
+  const VSecondaryButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.borderColor,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return VButton(label: label, intent: VIntent.secondary, onPressed: onPressed);
+    return VButton(
+      label: label,
+      intent: VIntent.secondary,
+      onPressed: onPressed,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      borderColor: borderColor,
+    );
   }
 }
 
@@ -44,8 +90,24 @@ class VGhostButton extends StatelessWidget {
   /// Called when the button is pressed.
   final VoidCallback? onPressed;
 
+  /// Optional background color override.
+  final Color? backgroundColor;
+
+  /// Optional foreground (text/icon) color override.
+  final Color? foregroundColor;
+
+  /// Optional border color override.
+  final Color? borderColor;
+
   /// Creates a [VGhostButton].
-  const VGhostButton({super.key, required this.label, required this.onPressed});
+  const VGhostButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.borderColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +116,9 @@ class VGhostButton extends StatelessWidget {
       intent: VIntent.secondary,
       variant: VButtonVariant.ghost,
       onPressed: onPressed,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      borderColor: borderColor,
     );
   }
 }
@@ -66,12 +131,35 @@ class VDestructiveButton extends StatelessWidget {
   /// Called when the button is pressed.
   final VoidCallback? onPressed;
 
+  /// Optional background color override.
+  final Color? backgroundColor;
+
+  /// Optional foreground (text/icon) color override.
+  final Color? foregroundColor;
+
+  /// Optional border color override.
+  final Color? borderColor;
+
   /// Creates a [VDestructiveButton].
-  const VDestructiveButton({super.key, required this.label, required this.onPressed});
+  const VDestructiveButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.borderColor,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return VButton(label: label, intent: VIntent.danger, onPressed: onPressed);
+    return VButton(
+      label: label,
+      intent: VIntent.danger,
+      onPressed: onPressed,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      borderColor: borderColor,
+    );
   }
 }
 

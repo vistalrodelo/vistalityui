@@ -48,6 +48,24 @@ class VButton extends StatelessWidget {
   /// Explicit radius override when not using a token.
   final double? radiusValue;
 
+  /// Optional background color override.
+  ///
+  /// When provided, this takes precedence over the resolved background color
+  /// from [intent] and [variant].
+  final Color? backgroundColor;
+
+  /// Optional foreground (text/icon) color override.
+  ///
+  /// When provided, this takes precedence over the resolved foreground color
+  /// from [intent] and [variant].
+  final Color? foregroundColor;
+
+  /// Optional border color override.
+  ///
+  /// When provided, this takes precedence over the resolved border color
+  /// from [intent] and [variant].
+  final Color? borderColor;
+
   /// Visual variant that drives background/border styles.
   final VButtonVariant variant;
 
@@ -75,6 +93,9 @@ class VButton extends StatelessWidget {
     this.size = VButtonSize.md,
     this.radius,
     this.radiusValue,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.borderColor,
     this.variant = VButtonVariant.solid,
     this.leading,
     this.trailing,
@@ -119,6 +140,9 @@ class VButton extends StatelessWidget {
       intent: intent,
       variant: variant,
       enabled: enabled,
+      backgroundOverride: backgroundColor,
+      foregroundOverride: foregroundColor,
+      borderOverride: borderColor,
     );
 
     return SizedBox(

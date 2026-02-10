@@ -12,12 +12,18 @@ class VAdvancedTable extends StatefulWidget {
   /// Rows per page.
   final int rowsPerPage;
 
+  /// Optional accent color override for active sort indicators.
+  ///
+  /// When not provided, the primary color from [VColors] is used.
+  final Color? accentColor;
+
   /// Creates a [VAdvancedTable].
   const VAdvancedTable({
     super.key,
     required this.headers,
     required this.rows,
     this.rowsPerPage = 5,
+    this.accentColor,
   });
 
   @override
@@ -94,7 +100,7 @@ class _VAdvancedTableState extends State<VAdvancedTable> {
                         Icon(
                           _ascending ? Icons.arrow_drop_up : Icons.arrow_drop_down,
                           size: 18,
-                          color: vc.primary,
+                          color: widget.accentColor ?? vc.primary,
                         ),
                     ],
                   ),

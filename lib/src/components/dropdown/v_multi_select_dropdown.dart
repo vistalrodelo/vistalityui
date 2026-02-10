@@ -67,6 +67,11 @@ class VMultiSelectDropdown<T> extends StatelessWidget {
   /// Whether to show error text below the control.
   final bool showErrorText;
 
+  /// Optional focused border color override.
+  ///
+  /// When not provided, the primary color from [VColors] is used.
+  final Color? focusBorderColor;
+
   /// Creates a [VMultiSelectDropdown].
   const VMultiSelectDropdown({
     super.key,
@@ -83,6 +88,7 @@ class VMultiSelectDropdown<T> extends StatelessWidget {
     this.contentPadding,
     this.controlHeight,
     this.showErrorText = true,
+    this.focusBorderColor,
   });
 
   @override
@@ -131,7 +137,10 @@ class VMultiSelectDropdown<T> extends StatelessWidget {
           border: border,
           enabledBorder: border,
           focusedBorder: border.copyWith(
-            borderSide: BorderSide(color: vc.primary, width: 2),
+            borderSide: BorderSide(
+              color: focusBorderColor ?? vc.primary,
+              width: 2,
+            ),
           ),
           errorBorder: border.copyWith(
             borderSide: BorderSide(color: vc.error),

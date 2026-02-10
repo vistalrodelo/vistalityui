@@ -18,6 +18,11 @@ class VRating extends StatelessWidget {
   /// Whether the control is enabled.
   final bool enabled;
 
+  /// Optional color override for filled stars.
+  ///
+  /// When not provided, the primary color from [VColors] is used.
+  final Color? activeColor;
+
   /// Creates a [VRating].
   const VRating({
     super.key,
@@ -26,6 +31,7 @@ class VRating extends StatelessWidget {
     this.max = 5,
     this.size = 24,
     this.enabled = true,
+    this.activeColor,
   });
 
   @override
@@ -44,7 +50,9 @@ class VRating extends StatelessWidget {
           icon: Icon(
             filled ? Icons.star : Icons.star_border,
             size: size,
-            color: filled ? vc.primary : cs.onSurface.withValues(alpha: 0.4),
+            color: filled
+                ? (activeColor ?? vc.primary)
+                : cs.onSurface.withValues(alpha: 0.4),
           ),
           onPressed: enabled ? () => onChanged?.call(index + 1) : null,
         );
