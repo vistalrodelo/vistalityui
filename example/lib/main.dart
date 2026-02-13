@@ -1,91 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:vistalityui/vistalityui.dart';
 
-/// Runs the Vistality UI example app.
+import 'component_showcase_screen.dart';
+//const kBrandSeed = Color(0xFF1565C0);//Color(0xFF0D47A1);// your brand color
+//const kBrandSeed = Color(0xFFEF7A10);
+const kBrandSeed = Color(0xFF0D47A1);
 void main() {
-  runApp(const VistalityExampleApp());
+  runApp(const VistalityUIPlayground());
 }
 
-/// Example app showcasing core components.
-class VistalityExampleApp extends StatelessWidget {
-  /// Creates a [VistalityExampleApp].
-  const VistalityExampleApp({super.key});
+class VistalityUIPlayground extends StatefulWidget {
+  const VistalityUIPlayground({super.key});
+
+  @override
+  State<VistalityUIPlayground> createState() => _VistalityUIPlaygroundState();
+}
+
+class _VistalityUIPlaygroundState extends State<VistalityUIPlayground> {
+  bool _isDarkMode = false;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Vistality UI Example',
-      theme: buildTheme(const Color(0xFF6366F1)),
-      home: const ExampleHomePage(),
-    );
-  }
-}
-
-/// Example home page with basic components.
-class ExampleHomePage extends StatelessWidget {
-  /// Creates an [ExampleHomePage].
-  const ExampleHomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Vistality UI')),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const VHeading('Components', level: VHeadingLevel.h4),
-          const SizedBox(height: 16),
-          const VHeading('Buttons', level: VHeadingLevel.h5),
-          const SizedBox(height: 8),
-          VButtonGroup(
-            children: [
-              VButton(
-                label: 'Primary action',
-                onPressed: () {},
-                leading: const Icon(Icons.flash_on),
-              ),
-              VButton(
-                label: 'Ghost button',
-                variant: VButtonVariant.ghost,
-                onPressed: () {},
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const VHeading('Button overrides', level: VHeadingLevel.h5),
-          const SizedBox(height: 8),
-          VButtonGroup(
-            children: [
-              VButton(
-                label: 'Overridden colors',
-                onPressed: () {},
-                backgroundColor: Colors.amber,
-                foregroundColor: Colors.black,
-                borderColor: Colors.deepOrange,
-                leading: const Icon(Icons.color_lens),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          VAccordion(
-            title: 'Details',
-            initiallyExpanded: true,
-            child: const Text(
-              'Vistality UI provides reusable components with a cohesive theme.',
-            ),
-          ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              VCheckbox(
-                value: true,
-                onChanged: (_) {},
-              ),
-              const SizedBox(width: 12),
-              const Text('Enable feature'),
-            ],
-          ),
-        ],
+      theme: buildTheme(
+        kBrandSeed,
+        brightness: Brightness.light,
+        defaultRadius: VRadiusSize.none,
+        textThemeBuilder: GoogleFonts.latoTextTheme,
+      ),
+      darkTheme: buildTheme(
+        kBrandSeed,
+        brightness: Brightness.dark,
+        defaultRadius: VRadiusSize.none,
+        textThemeBuilder: GoogleFonts.latoTextTheme,
+      ),
+      themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      debugShowCheckedModeBanner: false,
+      title: 'VistalityUI Playground',
+      home: ComponentShowcaseScreen(
+        isDarkMode: _isDarkMode,
+        onDarkModeChanged: (value) {
+          setState(() {
+            _isDarkMode = value;
+          });
+        },
       ),
     );
   }

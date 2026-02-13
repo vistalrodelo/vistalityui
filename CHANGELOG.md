@@ -19,3 +19,7 @@
 
 ## 1.0.3
 * Add color override option
+
+## 2.0.0
+* Add dark mode
+* Add example playground

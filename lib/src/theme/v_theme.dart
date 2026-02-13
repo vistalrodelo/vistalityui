@@ -14,13 +14,21 @@ ThemeData buildTheme(
   TextTheme Function(TextTheme base)? textThemeBuilder,
 }) {
   final scheme = ColorScheme.fromSeed(seedColor: seed, brightness: brightness);
-  final primary = seed;
-  final onPrimary =
-      primary.computeLuminance() > 0.55 ? Colors.black : Colors.white;
-  final adjustedScheme = scheme.copyWith(
-    primary: primary,
-    onPrimary: onPrimary,
-  );
+  // In light mode, force the seed to be used as the primary color directly.
+  // In dark mode, keep the full Material 3 scheme derived from the seed so
+  // colors follow the default Material behavior for dark themes.
+  final ColorScheme adjustedScheme;
+  if (brightness == Brightness.light) {
+    final primary = seed;
+    final onPrimary =
+        primary.computeLuminance() > 0.55 ? Colors.black : Colors.white;
+    adjustedScheme = scheme.copyWith(
+      primary: primary,
+      onPrimary: onPrimary,
+    );
+  } else {
+    adjustedScheme = scheme;
+  }
   final vRadius = _buildVRadius(defaultRadius);
   final dialogShape = RoundedRectangleBorder(
     borderRadius: vRadius.defaultBorderRadius(),
