@@ -7,16 +7,33 @@ A reusable Flutter UI component library with a Material 3 theme foundation, opin
 - Intent-based components (primary, secondary, success, warning, danger)
 - Consistent radius system with `VRadius` and per-component overrides
 - Ready-to-use input, layout, and data display components
-- Playground app included (`vistalityui_playground`)
+- Playground example app under `example/` (with dark-mode toggle and color overrides)
 
 ## Installation
 
-Add the package to your `pubspec.yaml`:
+### From pub.dev (recommended for users)
+
+In your app’s `pubspec.yaml`:
+
+```yaml
+dependencies:
+  vistalityui: ^1.0.3
+```
+
+Then run:
+
+```bash
+flutter pub get
+```
+
+### Local development (working on this repo)
+
+Inside this monorepo, the example app depends on the local package using a path:
 
 ```yaml
 dependencies:
   vistalityui:
-    path: ../vistalityui
+    path: ..
 ```
 
 ## Quick start
@@ -64,7 +81,10 @@ class MyApp extends StatelessWidget {
 
 ## Theme and radius
 
-`buildTheme` accepts a seed color and uses Material 3 to generate the palette. The primary color follows the seed.
+`buildTheme` accepts a seed color and uses Material 3 to generate the palette.
+
+- In **light mode**, the seed color is also used directly as the primary color, with `onPrimary` derived from its luminance.
+- In **dark mode**, the full Material 3 dark `ColorScheme.fromSeed` is used so colors follow the standard Material behavior for dark themes.
 
 You can set the default radius with `VRadiusSize` or a number:
 
@@ -137,12 +157,18 @@ VTextBox(
 - Utilities: clipboard, status
 - Charts: basic charts
 
-## Playground
+## Playground / example app
 
-Run the playground app to preview all components:
+The full playground lives in the package `example/` folder and is wired as a normal Flutter example app. It showcases:
+
+- All component groups
+- **Color overrides** for buttons and controls (e.g. `VButton.backgroundColor`, `VCheckbox.activeColor`, `VSegmented.selectedColor`, etc.)
+- A top-right **dark mode toggle** (built with `VSwitch`) that flips `ThemeMode` between light and dark while still using the same seed-based Material 3 theming.
+
+Run it from the package directory:
 
 ```bash
-cd vistalityui_playground
+cd vistalityui/example
 flutter run
 ```
 

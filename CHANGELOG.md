@@ -23,3 +23,6 @@
 ## 2.0.0
 * Add dark mode
 * Add example playground
+
+## 2.0.1
+* Update readmes
