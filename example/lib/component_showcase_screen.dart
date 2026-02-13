@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vistalityui/vistalityui.dart';
 
+const double _kPlaygroundButtonMaxWidth = 400;
+
+Widget _maxWidthButton(Widget child) => ConstrainedBox(
+  constraints: const BoxConstraints(maxWidth: _kPlaygroundButtonMaxWidth),
+  child: child,
+);
+
 class ComponentShowcaseScreen extends StatefulWidget {
   /// Whether dark mode is currently enabled.
   final bool isDarkMode;
@@ -435,10 +442,10 @@ class _ComponentShowcaseScreenState extends State<ComponentShowcaseScreen> {
                   label: 'Title',
                   hint: 'Type here',
                 ),
-                VButton(
+                _maxWidthButton(VButton(
                   label: 'Create',
                   onPressed: () {},
-                ),
+                )),
                 VDatePickerField(
                   controller: _dateController,
                   value: _pickedDate,
@@ -508,12 +515,12 @@ class _ComponentShowcaseScreenState extends State<ComponentShowcaseScreen> {
             children: _buildAccordionList([
               _DemoItem(
                 title: 'Buttons – Full Width',
-                child: VButton(
+                child: _maxWidthButton(VButton(
                   label: 'Continue',
                   fullWidth: true,
                   size: VButtonSize.lg,
                   onPressed: () {},
-                ),
+                )),
               ),
               _DemoItem(
                 title: 'Buttons – Group',
@@ -543,120 +550,120 @@ class _ComponentShowcaseScreenState extends State<ComponentShowcaseScreen> {
               _DemoItem(
                 title: 'Buttons – Intents',
                 child: _wrap([
-                  VButton(label: 'Primary', onPressed: () {}),
-                  VButton(
+                  _maxWidthButton(VButton(label: 'Primary', onPressed: () {})),
+                  _maxWidthButton(VButton(
                     label: 'Secondary',
                     intent: VIntent.secondary,
                     onPressed: () {},
-                  ),
-                  VButton(
+                  )),
+                  _maxWidthButton(VButton(
                     label: 'Success',
                     intent: VIntent.success,
                     onPressed: () {},
-                  ),
-                  VButton(
+                  )),
+                  _maxWidthButton(VButton(
                     label: 'Warning',
                     intent: VIntent.warning,
                     onPressed: () {},
-                  ),
-                  VButton(
+                  )),
+                  _maxWidthButton(VButton(
                     label: 'Danger',
                     intent: VIntent.danger,
                     onPressed: () {},
-                  ),
+                  )),
                 ]),
               ),
               _DemoItem(
                 title: 'Buttons – Sizes',
                 child: _wrap([
-                  VButton(
+                  _maxWidthButton(VButton(
                     label: 'Small',
                     size: VButtonSize.sm,
                     onPressed: () {},
-                  ),
-                  VButton(
+                  )),
+                  _maxWidthButton(VButton(
                     label: 'Medium',
                     size: VButtonSize.md,
                     onPressed: () {},
-                  ),
-                  VButton(
+                  )),
+                  _maxWidthButton(VButton(
                     label: 'Large',
                     size: VButtonSize.lg,
                     onPressed: () {},
-                  ),
+                  )),
                 ]),
               ),
               _DemoItem(
                 title: 'Buttons – States',
                 child: _wrap([
-                  VButton(
+                  _maxWidthButton(VButton(
                     label: 'Disabled',
                     onPressed: null,
-                  ),
-                  VButton(
+                  )),
+                  _maxWidthButton(VButton(
                     label: 'Loading',
                     loading: true,
                     onPressed: () {},
-                  ),
+                  )),
                 ]),
               ),
               _DemoItem(
                 title: 'Buttons – Variants',
                 child: _wrap([
-                  VButton(
+                  _maxWidthButton(VButton(
                     label: 'Primary',
                     onPressed: () {},
                     variant: VButtonVariant.solid,
-                  ),
-                  VButton(
+                  )),
+                  _maxWidthButton(VButton(
                     label: 'Secondary',
                     intent: VIntent.secondary,
                     variant: VButtonVariant.solid,
                     onPressed: () {},
-                  ),
-                  VButton(
+                  )),
+                  _maxWidthButton(VButton(
                     label: 'Ghost',
                     intent: VIntent.secondary,
                     variant: VButtonVariant.ghost,
                     onPressed: () {},
-                  ),
-                  VButton(
+                  )),
+                  _maxWidthButton(VButton(
                     label: 'Text',
                     variant: VButtonVariant.text,
                     onPressed: () {},
-                  ),
-                  VButton(
+                  )),
+                  _maxWidthButton(VButton(
                     label: 'Destructive',
                     intent: VIntent.danger,
                     onPressed: () {},
-                  ),
-                  VButton(
+                  )),
+                  _maxWidthButton(VButton(
                     label: 'Disabled',
                     onPressed: null,
-                  ),
-                  VButton(
+                  )),
+                  _maxWidthButton(VButton(
                     label: 'Loading',
                     loading: true,
                     onPressed: () {},
-                  ),
+                  )),
                 ]),
               ),
               _DemoItem(
                 title: 'Buttons – Overrides',
                 child: _wrap([
-                  VButton(
+                  _maxWidthButton(VButton(
                     label: 'Custom colors',
                     onPressed: () {},
                     backgroundColor: Colors.amber,
                     foregroundColor: Colors.black,
                     borderColor: Colors.deepOrange,
                     leading: const Icon(Icons.color_lens),
-                  ),
-                  VButton(
+                  )),
+                  _maxWidthButton(VButton(
                     label: 'Override text only',
                     onPressed: () {},
                     foregroundColor: Colors.pinkAccent,
-                  ),
+                  )),
                 ]),
               ),
             ]),
@@ -721,8 +728,8 @@ class _ComponentShowcaseScreenState extends State<ComponentShowcaseScreen> {
             title: 'Invite User',
             description: 'Send an invite to a new team member.',
             actions: [
-              VButton(label: 'Cancel', variant: VButtonVariant.text, onPressed: () {}),
-              VButton(label: 'Send', onPressed: () {}),
+              _maxWidthButton(VButton(label: 'Cancel', variant: VButtonVariant.text, onPressed: () {})),
+              _maxWidthButton(VButton(label: 'Send', onPressed: () {})),
             ],
           ),
         ),
@@ -1268,19 +1275,19 @@ class _ComponentShowcaseScreenState extends State<ComponentShowcaseScreen> {
           title: 'Color Overrides',
           child: _wrap([
             // Buttons
-            VButton(
+            _maxWidthButton(VButton(
               label: 'Custom colors',
               onPressed: () {},
               backgroundColor: Colors.amber,
               foregroundColor: Colors.black,
               borderColor: Colors.deepOrange,
               leading: const Icon(Icons.color_lens),
-            ),
-            VButton(
+            )),
+            _maxWidthButton(VButton(
               label: 'Override text only',
               onPressed: () {},
               foregroundColor: Colors.pinkAccent,
-            ),
+            )),
             // Toolbar + overflow
             VToolbarActions(
               actions: [

@@ -69,7 +69,11 @@ class VButton extends StatelessWidget {
   /// Visual variant that drives background/border styles.
   final VButtonVariant variant;
 
+  /// Optional prefix icon (IconData or Widget) shown before the label.
+  final Object? prefixIcon;
+
   /// Optional leading widget shown before the label.
+  /// If [prefixIcon] is also set, [prefixIcon] is shown first, then [leading].
   final Widget? leading;
 
   /// Optional trailing widget shown after the label.
@@ -97,6 +101,7 @@ class VButton extends StatelessWidget {
     this.foregroundColor,
     this.borderColor,
     this.variant = VButtonVariant.solid,
+    this.prefixIcon,
     this.leading,
     this.trailing,
     this.fullWidth = false,
@@ -182,9 +187,17 @@ class VButton extends StatelessWidget {
       );
     }
 
+    final prefix = prefixIcon != null ? _resolveIcon(prefixIcon!) : null;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (prefix != null) ...[
+          IconTheme.merge(
+            data: IconThemeData(color: style.foreground, size: 18),
+            child: prefix,
+          ),
+          const SizedBox(width: 8),
+        ],
         if (leading != null) ...[
           leading!,
           const SizedBox(width: 8),
@@ -202,5 +215,11 @@ class VButton extends StatelessWidget {
         ],
       ],
     );
+  }
+
+  static Widget? _resolveIcon(Object icon) {
+    if (icon is Widget) return icon;
+    if (icon is IconData) return Icon(icon, size: 18);
+    return null;
   }
 }

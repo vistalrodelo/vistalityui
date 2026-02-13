@@ -26,3 +26,6 @@
 
 ## 2.0.1
 * Update readmes
+
+## 2.1.0
+* Add live component playground

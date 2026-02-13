@@ -1,6 +1,6 @@
 name: vistalityui
 description: "A Material 3 Flutter UI library with seed-based theming and reusable components."
-version: 2.0.1
+version: 2.1.0
 repository: https://gitlab.com/mylibraries2/vistalityui
 
 environment:

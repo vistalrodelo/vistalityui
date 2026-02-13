@@ -2,6 +2,8 @@
 
 A reusable Flutter UI component library with a Material 3 theme foundation, opinionated defaults, and easy customization.
 
+![Vistality UI playground](../assets/vistalityui_playground.png)
+
 ## Features
 - Material 3 based theme with seed-driven color scheme
 - Intent-based components (primary, secondary, success, warning, danger)
@@ -17,7 +19,7 @@ In your app’s `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  vistalityui: ^1.0.3
+  vistalityui: ^2.1.0
 ```
 
 Then run:
@@ -78,6 +80,12 @@ class MyApp extends StatelessWidget {
   }
 }
 ```
+![App screenshot](./assets/1.png)
+![App screenshot](./assets/2.png)
+![App screenshot](./assets/3.png)
+![App screenshot](./assets/4.png)
+![App screenshot](./assets/5.png)
+![App screenshot](./assets/6.png)
 
 ## Theme and radius
 

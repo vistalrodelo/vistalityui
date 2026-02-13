@@ -44,6 +44,7 @@ export 'src/components/inputs/v_chip.dart';
 export 'src/components/inputs/v_chips_input.dart';
 export 'src/components/inputs/v_file_upload.dart';
 export 'src/components/inputs/v_masked_textbox.dart';
+export 'src/foundation/v_colors.dart';
 export 'src/foundation/v_intent.dart';
 export 'src/foundation/v_radius.dart';
 export 'src/theme/v_theme.dart';
