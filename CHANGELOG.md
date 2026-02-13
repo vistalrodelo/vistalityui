@@ -29,3 +29,6 @@
 
 ## 2.1.0
 * Add live component playground
+
+## 2.1.1
+* Update docs

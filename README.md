@@ -2,7 +2,7 @@
 
 A reusable Flutter UI component library with a Material 3 theme foundation, opinionated defaults, and easy customization.
 
-![Vistality UI playground](../assets/vistalityui_playground.png)
+![Vistality UI playground](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/vistalityui_playground.png)
 
 ## Features
 - Material 3 based theme with seed-driven color scheme
@@ -80,12 +80,17 @@ class MyApp extends StatelessWidget {
   }
 }
 ```
-![App screenshot](./assets/1.png)
-![App screenshot](./assets/2.png)
-![App screenshot](./assets/3.png)
-![App screenshot](./assets/4.png)
-![App screenshot](./assets/5.png)
-![App screenshot](./assets/6.png)
+![Screenshot 1](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/1.png)
+
+![Screenshot 2](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/2.png)
+
+![Screenshot 3](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/3.png)
+
+![Screenshot 4](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/4.png)
+
+![Screenshot 5](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/5.png)
+
+![Screenshot 6](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/6.png)
 
 ## Theme and radius
 
