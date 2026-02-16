@@ -32,6 +32,9 @@
 
 ## 2.1.1
 * Update docs
-* 
+
 ## 2.1.2
 * Update docs
+
+## 2.1.3
+* Add color picker for in UI playground
