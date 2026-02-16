@@ -41,6 +41,7 @@ export 'src/components/inputs/v_date_picker.dart';
 export 'src/components/inputs/v_time_picker.dart';
 export 'src/components/inputs/v_datetime_picker.dart';
 export 'src/components/inputs/v_chip.dart';
+export 'src/components/inputs/v_color_wheel_picker.dart';
 export 'src/components/inputs/v_chips_input.dart';
 export 'src/components/inputs/v_file_upload.dart';
 export 'src/components/inputs/v_masked_textbox.dart';

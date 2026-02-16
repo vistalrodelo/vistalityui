@@ -20,10 +20,25 @@ class VistalityUIPlayground extends StatefulWidget {
   State<VistalityUIPlayground> createState() => _VistalityUIPlaygroundState();
 }
 
+/// Numeric radius for each preset (used for slider when no custom value).
+double _radiusSizeToNumber(VRadiusSize size) {
+  switch (size) {
+    case VRadiusSize.none:
+      return 0;
+    case VRadiusSize.sm:
+      return 6;
+    case VRadiusSize.md:
+      return 10;
+    case VRadiusSize.lg:
+      return 16;
+  }
+}
+
 class _VistalityUIPlaygroundState extends State<VistalityUIPlayground> {
   bool _isDarkMode = false;
   Color _seedColor = kDefaultSeedColor;
   VRadiusSize _radiusSize = VRadiusSize.none;
+  double? _customRadius; // when set, theme uses this instead of _radiusSize
   String _selectedFontId = 'Poppins';
   TextTheme Function(TextTheme) _textThemeBuilder = GoogleFonts.poppinsTextTheme;
 
@@ -55,13 +70,13 @@ class _VistalityUIPlaygroundState extends State<VistalityUIPlayground> {
       theme: buildTheme(
         _seedColor,
         brightness: Brightness.light,
-        defaultRadius: _radiusSize,
+        defaultRadius: _customRadius ?? _radiusSize,
         textThemeBuilder: _textThemeBuilder,
       ),
       darkTheme: buildTheme(
         _seedColor,
         brightness: Brightness.dark,
-        defaultRadius: _radiusSize,
+        defaultRadius: _customRadius ?? _radiusSize,
         textThemeBuilder: _textThemeBuilder,
       ),
       themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light,
@@ -73,7 +88,13 @@ class _VistalityUIPlaygroundState extends State<VistalityUIPlayground> {
         seedColor: _seedColor,
         onSeedColorChanged: (value) => setState(() => _seedColor = value),
         radiusSize: _radiusSize,
-        onRadiusSizeChanged: (value) => setState(() => _radiusSize = value),
+        onRadiusSizeChanged: (value) =>
+            setState(() {
+              _radiusSize = value;
+              _customRadius = null;
+            }),
+        customRadius: _customRadius,
+        onCustomRadiusChanged: (value) => setState(() => _customRadius = value),
         getFontOptions: () => kPlaygroundFontOptions,
         selectedFontId: _selectedFontId,
         onFontChanged: _onFontChanged,

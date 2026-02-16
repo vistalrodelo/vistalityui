@@ -1,5 +1,3 @@
-import 'dart:math' show atan2, cos, pi, sin, sqrt;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vistalityui/vistalityui.dart';
@@ -46,48 +44,6 @@ class _AppBarSeparator extends StatelessWidget {
   }
 }
 
-void _rgbToHsv(int r, int g, int b, List<double> outHsv) {
-  final rr = r / 255, gg = g / 255, bb = b / 255;
-  final mx = rr > gg ? (rr > bb ? rr : bb) : (gg > bb ? gg : bb);
-  final mn = rr < gg ? (rr < bb ? rr : bb) : (gg < bb ? gg : bb);
-  final d = mx - mn;
-  final s = mx == 0 ? 0.0 : d / mx;
-  final v = mx;
-  double h = 0;
-  if (d != 0) {
-    if (mx == rr) {
-      h = (gg - bb) / d + (gg < bb ? 6 : 0);
-    } else if (mx == gg) {
-      h = (bb - rr) / d + 2;
-    } else {
-      h = (rr - gg) / d + 4;
-    }
-    h /= 6;
-  }
-  outHsv[0] = h * 360;
-  outHsv[1] = s;
-  outHsv[2] = v;
-}
-
-Color _hsvToColor(double h, double s, double v) {
-  h = h % 360;
-  if (h < 0) h += 360;
-  final c = v * s;
-  final x = c * (1 - ((h / 60) % 2 - 1).abs());
-  final m = v - c;
-  double r = 0, g = 0, b = 0;
-  if (h < 60) { r = c; g = x; b = 0; }
-  else if (h < 120) { r = x; g = c; b = 0; }
-  else if (h < 180) { r = 0; g = c; b = x; }
-  else if (h < 240) { r = 0; g = x; b = c; }
-  else if (h < 300) { r = x; g = 0; b = c; }
-  else { r = c; g = 0; b = x; }
-  final rv = ((r + m).clamp(0.0, 1.0) * 255).round();
-  final gv = ((g + m).clamp(0.0, 1.0) * 255).round();
-  final bv = ((b + m).clamp(0.0, 1.0) * 255).round();
-  return Color.fromRGBO(rv, gv, bv, 1.0);
-}
-
 /// Playground screen with sidebar navigation and main content area,
 /// matching the layout from the README image.
 class PlaygroundSidebarScreen extends StatefulWidget {
@@ -97,6 +53,8 @@ class PlaygroundSidebarScreen extends StatefulWidget {
   final ValueChanged<Color> onSeedColorChanged;
   final VRadiusSize radiusSize;
   final ValueChanged<VRadiusSize> onRadiusSizeChanged;
+  final double? customRadius;
+  final ValueChanged<double>? onCustomRadiusChanged;
   final List<PlaygroundFontOption> Function() getFontOptions;
   final String selectedFontId;
   final void Function(String id, TextTheme Function(TextTheme) builder) onFontChanged;
@@ -109,6 +67,8 @@ class PlaygroundSidebarScreen extends StatefulWidget {
     required this.onSeedColorChanged,
     required this.radiusSize,
     required this.onRadiusSizeChanged,
+    this.customRadius,
+    this.onCustomRadiusChanged,
     required this.getFontOptions,
     required this.selectedFontId,
     required this.onFontChanged,
@@ -151,6 +111,12 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
   DateTime? _sidebarDate;
   TimeOfDay? _sidebarTime;
   DateTime? _sidebarDateTime;
+  final List<Color> _recentPickerColors = [];
+
+  static List<Color> _addToRecent(List<Color> list, Color color) {
+    final next = [color, ...list.where((c) => c.value != color.value)];
+    return next.take(6).toList();
+  }
 
   @override
   void initState() {
@@ -213,9 +179,21 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
             seedColor: widget.seedColor,
             onSeedColorChanged: widget.onSeedColorChanged,
             onOpenColorWheel: () => _openColorWheelPicker(context),
+            recentColors: _recentPickerColors,
+            onAddToRecent: (color) => setState(() {
+              final next = _addToRecent(_recentPickerColors, color);
+              _recentPickerColors
+                ..clear()
+                ..addAll(next);
+            }),
           ),
           _AppBarSeparator(),
-          _RadiusChip(radiusSize: widget.radiusSize, onRadiusSizeChanged: widget.onRadiusSizeChanged),
+          _RadiusChip(
+            radiusSize: widget.radiusSize,
+            onRadiusSizeChanged: widget.onRadiusSizeChanged,
+            customRadius: widget.customRadius,
+            onCustomRadiusChanged: widget.onCustomRadiusChanged,
+          ),
           _AppBarSeparator(),
           _FontAutocomplete(
             getFontOptions: widget.getFontOptions,
@@ -697,6 +675,28 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
                   VSegmentOption(value: VRadiusSize.sm, label: 'SM'),
                   VSegmentOption(value: VRadiusSize.md, label: 'MD'),
                   VSegmentOption(value: VRadiusSize.lg, label: 'LG'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: 380,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Custom radius (0–200): ${(widget.customRadius ?? _radiusSizeToNumber(widget.radiusSize)).round()}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  VSlider(
+                    value: widget.customRadius ?? _radiusSizeToNumber(widget.radiusSize),
+                    onChanged: widget.onCustomRadiusChanged,
+                    min: 0,
+                    max: 200,
+                    divisions: 200,
+                  ),
                 ],
               ),
             ),
@@ -1948,10 +1948,28 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
       context: context,
       barrierColor: Colors.black54,
       useRootNavigator: false,
-      builder: (ctx) => _ColorWheelPickerDialog(
-        seedColor: widget.seedColor,
-        onPick: widget.onSeedColorChanged,
-        onClose: () => Navigator.of(ctx).pop(),
+      builder: (ctx) => AlertDialog(
+        title: const Text('Color wheel'),
+        content: SizedBox(
+          width: 420,
+          child: VColorWheelPicker(
+            initialColor: widget.seedColor,
+            commonColors: kVColorWheelCommonColors,
+            recentColors: _recentPickerColors,
+            contentWidth: 420,
+            onPick: (color) {
+              widget.onSeedColorChanged(color);
+              setState(() {
+                final next = _addToRecent(_recentPickerColors, color);
+                _recentPickerColors
+                  ..clear()
+                  ..addAll(next);
+              });
+            },
+            onClose: () => Navigator.of(ctx).pop(),
+          ),
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
       ),
     );
   }
@@ -2067,11 +2085,15 @@ class _SeedColorButton extends StatelessWidget {
     required this.seedColor,
     required this.onSeedColorChanged,
     this.onOpenColorWheel,
+    this.recentColors = const [],
+    this.onAddToRecent,
   });
 
   final Color seedColor;
   final ValueChanged<Color> onSeedColorChanged;
   final VoidCallback? onOpenColorWheel;
+  final List<Color> recentColors;
+  final ValueChanged<Color>? onAddToRecent;
 
   @override
   Widget build(BuildContext context) {
@@ -2090,6 +2112,8 @@ class _SeedColorButton extends StatelessWidget {
                 onClose: () => Navigator.of(dialogContext).pop(),
                 dialogContext: dialogContext,
                 onOpenColorWheel: onOpenColorWheel,
+                recentColors: recentColors,
+                onAddToRecent: onAddToRecent,
               ),
             );
           },
@@ -2139,6 +2163,8 @@ class _SeedColorPickerDialog extends StatefulWidget {
     required this.onClose,
     required this.dialogContext,
     required this.onOpenColorWheel,
+    this.recentColors = const [],
+    this.onAddToRecent,
   });
 
   final Color seedColor;
@@ -2146,6 +2172,8 @@ class _SeedColorPickerDialog extends StatefulWidget {
   final VoidCallback onClose;
   final BuildContext dialogContext;
   final VoidCallback? onOpenColorWheel;
+  final List<Color> recentColors;
+  final ValueChanged<Color>? onAddToRecent;
 
   @override
   State<_SeedColorPickerDialog> createState() => _SeedColorPickerDialogState();
@@ -2160,13 +2188,20 @@ class _SeedColorPickerDialogState extends State<_SeedColorPickerDialog> {
     if (_showingColorWheel) {
       return AlertDialog(
         title: const Text('Color wheel'),
-        content: _ColorWheelPickerContent(
-          seedColor: widget.seedColor,
-          onPick: (color) {
-            widget.onSeedColorChanged(color);
-            setState(() => _showingColorWheel = false);
-          },
-          onClose: () => setState(() => _showingColorWheel = false),
+        content: SizedBox(
+          width: 420,
+          child: VColorWheelPicker(
+            initialColor: widget.seedColor,
+            commonColors: kVColorWheelCommonColors,
+            recentColors: widget.recentColors,
+            contentWidth: 420,
+            onPick: (color) {
+              widget.onSeedColorChanged(color);
+              widget.onAddToRecent?.call(color);
+              setState(() => _showingColorWheel = false);
+            },
+            onClose: () => setState(() => _showingColorWheel = false),
+          ),
         ),
         contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
       );
@@ -2282,414 +2317,6 @@ class _SeedColorPickerDialogState extends State<_SeedColorPickerDialog> {
   }
 }
 
-/// Embeddable color wheel body (wheel + hex + preview + Cancel/Apply). Used inside a dialog.
-class _ColorWheelPickerContent extends StatefulWidget {
-  const _ColorWheelPickerContent({
-    required this.seedColor,
-    required this.onPick,
-    required this.onClose,
-  });
-
-  final Color seedColor;
-  final ValueChanged<Color> onPick;
-  final VoidCallback onClose;
-
-  @override
-  State<_ColorWheelPickerContent> createState() => _ColorWheelPickerContentState();
-}
-
-class _ColorWheelPickerContentState extends State<_ColorWheelPickerContent> {
-  static const double _wheelSize = 260;
-  static const double _ringWidth = 28;
-  static const double _markerRadius = 8;
-  /// Hue ring marker same width as the ring.
-  double get _hueMarkerRadius => _ringWidth / 2;
-
-  late double _h;
-  late double _s;
-  late double _v;
-  final List<double> _hsv = [0, 0, 0];
-
-  double get _center => _wheelSize / 2;
-  double get _outerRadius => _center - 2;
-  double get _innerRadius => _outerRadius - _ringWidth;
-  /// Radial center of the ring (for hue marker position).
-  double get _ringMidRadius => _innerRadius + _ringWidth / 2;
-  /// Equilateral triangle: right apex touches inner edge of ring (3 o'clock). Base vertical on left.
-  /// Geometry: apex at (innerRadius,0), base vertices at (-innerRadius/2, ±innerRadius*sqrt(3)/2) from center.
-  double get _triangleSize => _innerRadius * 1.5;
-  double get _triangleHeight => _innerRadius * sqrt(3);
-  double get _triangleLeft => _center - _innerRadius / 2;
-  double get _triangleTop => _center - _innerRadius * sqrt(3) / 2;
-
-  @override
-  void initState() {
-    super.initState();
-    _hsv[0] = 0;
-    _hsv[1] = 1;
-    _hsv[2] = 1;
-    _rgbToHsv(
-      (widget.seedColor.toARGB32() >> 16) & 0xFF,
-      (widget.seedColor.toARGB32() >> 8) & 0xFF,
-      widget.seedColor.toARGB32() & 0xFF,
-      _hsv,
-    );
-    _h = _hsv[0];
-    _s = _hsv[1];
-    _v = _hsv[2];
-  }
-
-  Color get _currentColor => _hsvToColor(_h, _s, _v);
-
-  /// 0° = right (red), clockwise = increasing hue.
-  void _updateHueFromOffset(Offset localPosition) {
-    final dx = localPosition.dx - _center;
-    final dy = localPosition.dy - _center;
-    final angleRad = atan2(dy, dx);
-    final hue = (angleRad * 180 / pi + 360) % 360;
-    setState(() => _h = hue);
-  }
-
-  /// Triangle: base left (white top, black bottom), apex right (full hue). s = x/rightX, v = (1-y/h)*(1-s)+s.
-  void _updateSvFromOffset(Offset localPosition) {
-    final w = _triangleSize;
-    final h = _triangleHeight;
-    final left = _triangleLeft;
-    final top = _triangleTop;
-    final x = (localPosition.dx - left).clamp(0.0, w);
-    final y = (localPosition.dy - top).clamp(0.0, h);
-    final rightX = y <= h / 2 ? y * 2 * w / h : (h - y) * 2 * w / h;
-    if (rightX <= 0) {
-      setState(() => _s = 0);
-      return;
-    }
-    final s = (x / rightX).clamp(0.0, 1.0);
-    final v = (1 - y / h) * (1 - s) + s;
-    setState(() {
-      _s = s;
-      _v = v.clamp(0.0, 1.0);
-    });
-  }
-
-  bool _isInRing(Offset p) {
-    final dx = p.dx - _center;
-    final dy = p.dy - _center;
-    final r = sqrt(dx * dx + dy * dy);
-    return r >= _innerRadius && r <= _outerRadius;
-  }
-
-  bool _isInTriangle(Offset p) {
-    final w = _triangleSize;
-    final h = _triangleHeight;
-    final left = _triangleLeft;
-    final top = _triangleTop;
-    final x = p.dx - left;
-    final y = p.dy - top;
-    if (x < 0 || x > w || y < 0 || y > h) return false;
-    final rightX = y <= h / 2 ? y * 2 * w / h : (h - y) * 2 * w / h;
-    return x <= rightX;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final hueRad = _h * pi / 180;
-    final hueMarkerX = _center + _ringMidRadius * cos(hueRad);
-    final hueMarkerY = _center + _ringMidRadius * sin(hueRad);
-    final w = _triangleSize;
-    final h = _triangleHeight;
-    final left = _triangleLeft;
-    final top = _triangleTop;
-    final y = _s < 1 ? h * (1 - _v) / (1 - _s) : h / 2;
-    final rightX = y <= h / 2 ? y * 2 * w / h : (h - y) * 2 * w / h;
-    final svX = left + _s * rightX;
-    final svY = top + y.clamp(0.0, h);
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        GestureDetector(
-          onPanStart: (d) => _onPickDrag(d.localPosition),
-          onPanUpdate: (d) => _onPickDrag(d.localPosition),
-          onTapDown: (d) => _onPickDrag(d.localPosition),
-          child: SizedBox(
-            width: _wheelSize,
-            height: _wheelSize,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                CustomPaint(
-                  size: Size(_wheelSize, _wheelSize),
-                  painter: _HollowCircumcirclePainter(
-                    center: _center,
-                    innerRadius: _innerRadius,
-                    hollowColor: Theme.of(context).colorScheme.surface,
-                  ),
-                ),
-                CustomPaint(
-                  size: Size(_wheelSize, _wheelSize),
-                  painter: _HueRingPainter(
-                    center: _center,
-                    innerRadius: _innerRadius,
-                    outerRadius: _outerRadius,
-                    hollowColor: Theme.of(context).colorScheme.surface,
-                  ),
-                ),
-                Positioned(
-                  left: _triangleLeft,
-                  top: _triangleTop,
-                  child: CustomPaint(
-                    size: Size(_triangleSize, _triangleHeight),
-                    painter: _SatValTrianglePainter(hue: _h),
-                  ),
-                ),
-                Positioned(
-                  left: hueMarkerX - _hueMarkerRadius,
-                  top: hueMarkerY - _hueMarkerRadius,
-                  child: Container(
-                    width: _hueMarkerRadius * 2,
-                    height: _hueMarkerRadius * 2,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                      border: Border.all(color: Colors.black87, width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          blurRadius: 2,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: svX - _markerRadius,
-                  top: svY - _markerRadius,
-                  child: Container(
-                    width: _markerRadius * 2,
-                    height: _markerRadius * 2,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                      border: Border.all(color: Colors.black87, width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          blurRadius: 2,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          _colorToHex(_currentColor),
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: cs.onSurface,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          height: 40,
-          decoration: BoxDecoration(
-            color: _currentColor,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: cs.outline),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            TextButton(
-              onPressed: widget.onClose,
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () {
-                widget.onPick(_currentColor);
-                widget.onClose();
-              },
-              child: const Text('Apply'),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  void _onPickDrag(Offset localPosition) {
-    if (_isInRing(localPosition)) {
-      _updateHueFromOffset(localPosition);
-    } else if (_isInTriangle(localPosition)) {
-      _updateSvFromOffset(localPosition);
-    }
-  }
-}
-
-/// Standalone color wheel dialog (e.g. from Overview). Uses [_ColorWheelPickerContent].
-class _ColorWheelPickerDialog extends StatelessWidget {
-  const _ColorWheelPickerDialog({
-    required this.seedColor,
-    required this.onPick,
-    required this.onClose,
-  });
-
-  final Color seedColor;
-  final ValueChanged<Color> onPick;
-  final VoidCallback onClose;
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Color wheel'),
-      content: _ColorWheelPickerContent(
-        seedColor: seedColor,
-        onPick: onPick,
-        onClose: onClose,
-      ),
-      contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
-    );
-  }
-}
-
-/// Fills the area inside the circumcircle (through the triangle tips) and outside the triangle
-/// with [hollowColor] so the modal background is not transparent/empty.
-class _HollowCircumcirclePainter extends CustomPainter {
-  _HollowCircumcirclePainter({
-    required this.center,
-    required this.innerRadius,
-    required this.hollowColor,
-  });
-
-  final double center;
-  final double innerRadius;
-  final Color hollowColor;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(center, center);
-    final circlePath = Path()..addOval(Rect.fromCircle(center: c, radius: innerRadius));
-    final sqrt3 = sqrt(3);
-    final trianglePath = Path()
-      ..moveTo(center + innerRadius, center)
-      ..lineTo(center - innerRadius / 2, center - innerRadius * sqrt3 / 2)
-      ..lineTo(center - innerRadius / 2, center + innerRadius * sqrt3 / 2)
-      ..close();
-    final hollowPath = Path.combine(PathOperation.difference, circlePath, trianglePath);
-    canvas.drawPath(hollowPath, Paint()..color = hollowColor);
-  }
-
-  @override
-  bool shouldRepaint(covariant _HollowCircumcirclePainter oldDelegate) =>
-      oldDelegate.hollowColor != hollowColor || oldDelegate.innerRadius != innerRadius;
-}
-
-/// Paints only the hue ring (donut). The hollow (circumcircle − triangle) is drawn by [_HollowCircumcirclePainter].
-class _HueRingPainter extends CustomPainter {
-  _HueRingPainter({
-    required this.center,
-    required this.innerRadius,
-    required this.outerRadius,
-    required this.hollowColor,
-  });
-
-  final double center;
-  final double innerRadius;
-  final double outerRadius;
-  final Color hollowColor;
-
-  static final List<Color> _rainbowColors = [
-    _hsvToColor(0, 1, 1),
-    _hsvToColor(60, 1, 1),
-    _hsvToColor(120, 1, 1),
-    _hsvToColor(180, 1, 1),
-    _hsvToColor(240, 1, 1),
-    _hsvToColor(300, 1, 1),
-    _hsvToColor(360, 1, 1),
-  ];
-
-  static const List<double> _rainbowStops = [0, 1/6, 2/6, 3/6, 4/6, 5/6, 1.0];
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(center, center);
-    final rect = Rect.fromCircle(center: c, radius: outerRadius + 2);
-    final gradient = SweepGradient(
-      center: Alignment.center,
-      startAngle: 0,
-      endAngle: 2 * pi,
-      colors: _rainbowColors,
-      stops: _rainbowStops,
-    );
-    // Ring = outer circle with inner circle as hole. Use evenOdd so the inner contour is a hole.
-    final ringPath = Path()
-      ..addOval(Rect.fromCircle(center: c, radius: outerRadius))
-      ..addOval(Rect.fromCircle(center: c, radius: innerRadius))
-      ..fillType = PathFillType.evenOdd;
-    canvas.drawPath(
-      ringPath,
-      Paint()
-        ..shader = gradient.createShader(rect)
-        ..style = PaintingStyle.fill,
-    );
-    final borderPaint = Paint()
-      ..color = Colors.black26
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    canvas.drawCircle(c, outerRadius, borderPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _HueRingPainter oldDelegate) =>
-      oldDelegate.hollowColor != hollowColor;
-}
-
-class _SatValTrianglePainter extends CustomPainter {
-  _SatValTrianglePainter({required this.hue});
-
-  final double hue;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-    final path = Path()
-      ..moveTo(0, 0)
-      ..lineTo(0, h)
-      ..lineTo(w, h / 2)
-      ..close();
-    final hueColor = _hsvToColor(hue, 1, 1);
-    for (var py = 0.0; py < h; py += 1.5) {
-      final rightX = py <= h / 2 ? py * 2 * w / h : (h - py) * 2 * w / h;
-      if (rightX <= 0) continue;
-      final leftColor = Color.lerp(Colors.white, Colors.black, py / h)!;
-      final gradientPaint = Paint()
-        ..shader = LinearGradient(
-          colors: [leftColor, hueColor],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ).createShader(Rect.fromLTRB(0, py, rightX, py + 2));
-      canvas.drawRect(Rect.fromLTRB(0, py, rightX, py + 2), gradientPaint);
-    }
-    final borderPaint = Paint()
-      ..color = Colors.black26
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    canvas.drawPath(path, borderPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _SatValTrianglePainter oldDelegate) =>
-      oldDelegate.hue != hue;
-}
-
 String _radiusLabel(VRadiusSize size) {
   switch (size) {
     case VRadiusSize.none:
@@ -2700,6 +2327,19 @@ String _radiusLabel(VRadiusSize size) {
       return 'MD';
     case VRadiusSize.lg:
       return 'LG';
+  }
+}
+
+double _radiusSizeToNumber(VRadiusSize size) {
+  switch (size) {
+    case VRadiusSize.none:
+      return 0;
+    case VRadiusSize.sm:
+      return 6;
+    case VRadiusSize.md:
+      return 10;
+    case VRadiusSize.lg:
+      return 16;
   }
 }
 
@@ -2848,10 +2488,14 @@ class _RadiusChip extends StatelessWidget {
   const _RadiusChip({
     required this.radiusSize,
     required this.onRadiusSizeChanged,
+    this.customRadius,
+    this.onCustomRadiusChanged,
   });
 
   final VRadiusSize radiusSize;
   final ValueChanged<VRadiusSize> onRadiusSizeChanged;
+  final double? customRadius;
+  final ValueChanged<double>? onCustomRadiusChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -2862,45 +2506,81 @@ class _RadiusChip extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
           onTap: () {
+            final initialRadius =
+                customRadius ?? _radiusSizeToNumber(radiusSize);
+            double localRadius = initialRadius;
             showDialog<void>(
               context: context,
-              builder: (ctx) => AlertDialog(
-                title: const Text('Corner radius'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      'Default radius for buttons, fields, and cards. Changes apply immediately.',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    VSegmented<VRadiusSize>(
-                      value: radiusSize,
-                      onChanged: (v) {
-                        onRadiusSizeChanged(v);
-                        Navigator.of(ctx).pop();
-                      },
-                      options: const [
-                        VSegmentOption(value: VRadiusSize.none, label: 'None'),
-                        VSegmentOption(value: VRadiusSize.sm, label: 'SM'),
-                        VSegmentOption(value: VRadiusSize.md, label: 'MD'),
-                        VSegmentOption(value: VRadiusSize.lg, label: 'LG'),
+              builder: (ctx) {
+                return StatefulBuilder(
+                  builder: (ctx, setStateDialog) => AlertDialog(
+                    title: const Text('Corner radius'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Default radius for buttons, fields, and cards. Changes apply immediately.',
+                          style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                                color: Theme.of(ctx)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
+                        ),
+                        const SizedBox(height: 20),
+                        VSegmented<VRadiusSize>(
+                          value: radiusSize,
+                          onChanged: (v) {
+                            onRadiusSizeChanged(v);
+                            Navigator.of(ctx).pop();
+                          },
+                          options: const [
+                            VSegmentOption(
+                                value: VRadiusSize.none, label: 'None'),
+                            VSegmentOption(
+                                value: VRadiusSize.sm, label: 'SM'),
+                            VSegmentOption(
+                                value: VRadiusSize.md, label: 'MD'),
+                            VSegmentOption(
+                                value: VRadiusSize.lg, label: 'LG'),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Custom radius (0–200): ${localRadius.round()}',
+                          style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(ctx)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
+                        ),
+                        VSlider(
+                          value: localRadius,
+                          onChanged: onCustomRadiusChanged == null
+                              ? null
+                              : (v) {
+                                  setStateDialog(() => localRadius = v);
+                                  onCustomRadiusChanged?.call(v);
+                                },
+                          min: 0,
+                          max: 200,
+                          divisions: 200,
+                        ),
                       ],
                     ),
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(ctx).pop(),
-                    child: const Text('Close'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Text('Close'),
+                      ),
+                    ],
+                    contentPadding:
+                        const EdgeInsets.fromLTRB(24, 20, 24, 8),
+                    actionsPadding:
+                        const EdgeInsets.fromLTRB(24, 0, 24, 16),
                   ),
-                ],
-                contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
-                actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-              ),
+                );
+              },
             );
           },
           child: Padding(
@@ -2923,7 +2603,9 @@ class _RadiusChip extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  _radiusLabel(radiusSize),
+                  customRadius != null
+                      ? 'Custom (${customRadius!.round()})'
+                      : _radiusLabel(radiusSize),
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(fontSize: 15),
                 ),
               ],
