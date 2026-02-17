@@ -37,7 +37,7 @@ double _radiusSizeToNumber(VRadiusSize size) {
 class _VistalityUIPlaygroundState extends State<VistalityUIPlayground> {
   bool _isDarkMode = false;
   Color _seedColor = kDefaultSeedColor;
-  VRadiusSize _radiusSize = VRadiusSize.none;
+  VRadiusSize _radiusSize = VRadiusSize.lg;
   double? _customRadius; // when set, theme uses this instead of _radiusSize
   String _selectedFontId = 'Poppins';
   TextTheme Function(TextTheme) _textThemeBuilder = GoogleFonts.poppinsTextTheme;

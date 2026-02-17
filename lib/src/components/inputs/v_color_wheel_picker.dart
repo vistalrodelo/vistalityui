@@ -265,8 +265,10 @@ class VColorWheelPicker extends StatefulWidget {
   @override
   State<VColorWheelPicker> createState() => _VColorWheelPickerState();
 
-  /// Shows the color wheel in a dialog. Returns the selected color when Apply is
-  /// tapped, or null when Cancel/back is used.
+  /// Convenience helper to show a modal color wheel dialog.
+  ///
+  /// Returns the selected color when **Apply** is tapped, or `null` when the
+  /// user cancels or dismisses the dialog.
   static Future<Color?> show(
     BuildContext context, {
     required Color initialColor,
@@ -413,7 +415,8 @@ class _VColorWheelPickerState extends State<VColorWheelPicker> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: cs.surfaceVariant.withValues(alpha: 0.4),
+                    color:
+                        cs.surfaceContainerHighest.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: cs.outline.withValues(alpha: 0.3),
@@ -693,12 +696,16 @@ class _VColorWheelPickerState extends State<VColorWheelPicker> {
               onPressed: widget.onClose,
             ),
             const SizedBox(width: 8),
-            VButton(
-              label: 'Apply',
-              onPressed: () {
-                widget.onPick(_currentColor);
-                widget.onClose();
-              },
+            SizedBox(
+              width: 112,
+              child: VButton(
+                label: 'Apply',
+                size: VButtonSize.sm,
+                onPressed: () {
+                  widget.onPick(_currentColor);
+                  widget.onClose();
+                },
+              ),
             ),
           ],
         ),

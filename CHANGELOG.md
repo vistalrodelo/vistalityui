@@ -38,3 +38,6 @@
 
 ## 2.1.3
 * Add color picker for in UI playground
+
+## 2.1.4
+* Playground improvements

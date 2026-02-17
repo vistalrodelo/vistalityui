@@ -1,3 +1,5 @@
+import 'dart:math' show min;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vistalityui/vistalityui.dart';
@@ -87,6 +89,10 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
   static const _chipsId = 'chips';
   static const _typographyId = 'typography';
   static const _colorsId = 'colors';
+  static const _mobileMenuSeedColor = 'seed_color';
+  static const _mobileMenuCornerRadius = 'corner_radius';
+  static const _mobileMenuFont = 'font';
+  static const _mobileMenuDarkMode = 'dark_mode';
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final TextEditingController _sidebarTextController;
@@ -174,63 +180,9 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
           'VistalityUI',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
         ),
-        actions: [
-          _SeedColorButton(
-            seedColor: widget.seedColor,
-            onSeedColorChanged: widget.onSeedColorChanged,
-            onOpenColorWheel: () => _openColorWheelPicker(context),
-            recentColors: _recentPickerColors,
-            onAddToRecent: (color) => setState(() {
-              final next = _addToRecent(_recentPickerColors, color);
-              _recentPickerColors
-                ..clear()
-                ..addAll(next);
-            }),
-          ),
-          _AppBarSeparator(),
-          _RadiusChip(
-            radiusSize: widget.radiusSize,
-            onRadiusSizeChanged: widget.onRadiusSizeChanged,
-            customRadius: widget.customRadius,
-            onCustomRadiusChanged: widget.onCustomRadiusChanged,
-          ),
-          _AppBarSeparator(),
-          _FontAutocomplete(
-            getFontOptions: widget.getFontOptions,
-            value: widget.selectedFontId,
-            onChanged: widget.onFontChanged,
-          ),
-          _AppBarSeparator(),
-          VButton(
-            label: 'Search components',
-            prefixIcon: const Icon(Icons.search),
-            variant: VButtonVariant.text,
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => ComponentShowcaseScreen(
-                    isDarkMode: widget.isDarkMode,
-                    onDarkModeChanged: widget.onDarkModeChanged,
-                  ),
-                ),
-              );
-            },
-            //child: const Text('Search components'),
-          ),
-          _AppBarSeparator(),
-          const SizedBox(width: 50),
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: Center(
-              child: VSwitch(
-                value: widget.isDarkMode,
-                onChanged: widget.onDarkModeChanged,
-                label: 'Dark mode',
-              ),
-            ),
-          ),
-          const SizedBox(width: 40),
-        ],
+        actions: isWide
+            ? _buildWideAppBarActions(context)
+            : _buildCompactAppBarActions(context),
       ),
       drawer: isWide ? null : _buildDrawer(context),
       body: Row(
@@ -261,6 +213,126 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
         ],
       ),
     );
+  }
+
+  List<Widget> _buildWideAppBarActions(BuildContext context) {
+    return [
+      _SeedColorButton(
+        seedColor: widget.seedColor,
+        onSeedColorChanged: widget.onSeedColorChanged,
+        onOpenColorWheel: () => _openColorWheelPicker(context),
+        recentColors: _recentPickerColors,
+        onAddToRecent: (color) => setState(() {
+          final next = _addToRecent(_recentPickerColors, color);
+          _recentPickerColors
+            ..clear()
+            ..addAll(next);
+        }),
+      ),
+      _AppBarSeparator(),
+      _RadiusChip(
+        radiusSize: widget.radiusSize,
+        onRadiusSizeChanged: widget.onRadiusSizeChanged,
+        customRadius: widget.customRadius,
+        onCustomRadiusChanged: widget.onCustomRadiusChanged,
+      ),
+      _AppBarSeparator(),
+      _FontAutocomplete(
+        getFontOptions: widget.getFontOptions,
+        value: widget.selectedFontId,
+        onChanged: widget.onFontChanged,
+      ),
+      _AppBarSeparator(),
+      VButton(
+        label: 'Search components',
+        prefixIcon: const Icon(Icons.search),
+        variant: VButtonVariant.text,
+        onPressed: () => _openComponentSearch(context),
+      ),
+      _AppBarSeparator(),
+      const SizedBox(width: 50),
+      Padding(
+        padding: const EdgeInsets.only(right: 12),
+        child: Center(
+          child: VSwitch(
+            value: widget.isDarkMode,
+            onChanged: widget.onDarkModeChanged,
+            label: 'Dark mode',
+          ),
+        ),
+      ),
+      const SizedBox(width: 40),
+    ];
+  }
+
+  List<Widget> _buildCompactAppBarActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.search),
+        tooltip: 'Search components',
+        onPressed: () => _openComponentSearch(context),
+      ),
+      PopupMenuButton<String>(
+        tooltip: 'Playground options',
+        onSelected: (value) {
+          switch (value) {
+            case _mobileMenuSeedColor:
+              _openSeedColorDialog(context);
+              break;
+            case _mobileMenuCornerRadius:
+              _openRadiusDialog(context);
+              break;
+            case _mobileMenuFont:
+              _openFontPickerDialog(context);
+              break;
+            case _mobileMenuDarkMode:
+              widget.onDarkModeChanged(!widget.isDarkMode);
+              break;
+          }
+        },
+        itemBuilder: (context) => [
+          const PopupMenuItem<String>(
+            value: _mobileMenuSeedColor,
+            child: ListTile(
+              leading: Icon(Icons.palette_outlined),
+              title: Text('Seed color'),
+              contentPadding: EdgeInsets.zero,
+              dense: true,
+            ),
+          ),
+          const PopupMenuItem<String>(
+            value: _mobileMenuCornerRadius,
+            child: ListTile(
+              leading: Icon(Icons.rounded_corner),
+              title: Text('Corner radius'),
+              contentPadding: EdgeInsets.zero,
+              dense: true,
+            ),
+          ),
+          const PopupMenuItem<String>(
+            value: _mobileMenuFont,
+            child: ListTile(
+              leading: Icon(Icons.font_download_outlined),
+              title: Text('Font'),
+              contentPadding: EdgeInsets.zero,
+              dense: true,
+            ),
+          ),
+          PopupMenuItem<String>(
+            value: _mobileMenuDarkMode,
+            child: ListTile(
+              leading: Icon(
+                widget.isDarkMode ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+              ),
+              title: Text(widget.isDarkMode ? 'Dark mode: on' : 'Dark mode: off'),
+              contentPadding: EdgeInsets.zero,
+              dense: true,
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(width: 4),
+    ];
   }
 
   Widget _buildDrawer(BuildContext context) {
@@ -389,89 +461,130 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
   }
 
   Widget _buildContent(BuildContext context) {
+    late final Widget content;
     switch (_selectedId) {
       case _overviewId:
-        return _buildOverviewContent(context);
+        content = _buildOverviewContent(context);
+        break;
       case _buttonsId:
-        return _buildButtonsContent(context);
+        content = _buildButtonsContent(context);
+        break;
       case _fabsId:
-        return _buildFabsContent(context);
+        content = _buildFabsContent(context);
+        break;
       case _segmentedId:
-        return _buildSegmentedContent(context);
+        content = _buildSegmentedContent(context);
+        break;
       case _iconButtonsId:
-        return _buildIconButtonsContent(context);
+        content = _buildIconButtonsContent(context);
+        break;
       case _chipsId:
-        return _buildChipsContent(context);
+        content = _buildChipsContent(context);
+        break;
       case _typographyId:
-        return _buildTypographyContent(context);
+        content = _buildTypographyContent(context);
+        break;
       case _colorsId:
-        return _buildColorsContent(context);
+        content = _buildColorsContent(context);
+        break;
       case 'text_fields':
-        return _buildTextFieldsContent(context);
+        content = _buildTextFieldsContent(context);
+        break;
       case 'multiline_text':
-        return _buildMultilineTextContent(context);
+        content = _buildMultilineTextContent(context);
+        break;
       case 'checkboxes':
-        return _buildCheckboxesContent(context);
+        content = _buildCheckboxesContent(context);
+        break;
       case 'switches':
-        return _buildSwitchesContent(context);
+        content = _buildSwitchesContent(context);
+        break;
       case 'radio':
-        return _buildRadioContent(context);
+        content = _buildRadioContent(context);
+        break;
       case 'dropdown':
-        return _buildDropdownContent(context);
+        content = _buildDropdownContent(context);
+        break;
       case 'slider':
-        return _buildSliderContent(context);
+        content = _buildSliderContent(context);
+        break;
       case 'rating':
-        return _buildRatingContent(context);
+        content = _buildRatingContent(context);
+        break;
       case 'cards':
-        return _buildCardsContent(context);
+        content = _buildCardsContent(context);
+        break;
       case 'lists':
-        return _buildListsContent(context);
+        content = _buildListsContent(context);
+        break;
       case 'accordion':
-        return _buildAccordionContent(context);
+        content = _buildAccordionContent(context);
+        break;
       case 'table':
-        return _buildTableContent(context);
+        content = _buildTableContent(context);
+        break;
       case 'timeline':
-        return _buildTimelineContent(context);
+        content = _buildTimelineContent(context);
+        break;
       case 'feed':
-        return _buildFeedContent(context);
+        content = _buildFeedContent(context);
+        break;
       case 'grid':
-        return _buildGridContent(context);
+        content = _buildGridContent(context);
+        break;
       case 'context_menu':
-        return _buildContextMenuContent(context);
+        content = _buildContextMenuContent(context);
+        break;
       case 'overflow_menu':
-        return _buildOverflowMenuContent(context);
+        content = _buildOverflowMenuContent(context);
+        break;
       case 'toolbar':
-        return _buildToolbarContent(context);
+        content = _buildToolbarContent(context);
+        break;
       case 'auto_sizer':
-        return _buildAutoSizerContent(context);
+        content = _buildAutoSizerContent(context);
+        break;
       case 'dialogs':
-        return _buildDialogsContent(context);
+        content = _buildDialogsContent(context);
+        break;
       case 'icons':
-        return _buildIconsContent(context);
+        content = _buildIconsContent(context);
+        break;
       case 'multi_select_dropdown':
-        return _buildMultiSelectDropdownContent(context);
+        content = _buildMultiSelectDropdownContent(context);
+        break;
       case 'chips_input':
-        return _buildChipsInputContent(context);
+        content = _buildChipsInputContent(context);
+        break;
       case 'otp_input':
-        return _buildOtpInputContent(context);
+        content = _buildOtpInputContent(context);
+        break;
       case 'number_input':
-        return _buildNumberInputContent(context);
+        content = _buildNumberInputContent(context);
+        break;
       case 'masked_textbox':
-        return _buildMaskedTextBoxContent(context);
+        content = _buildMaskedTextBoxContent(context);
+        break;
       case 'search_box':
-        return _buildSearchBoxContent(context);
+        content = _buildSearchBoxContent(context);
+        break;
       case 'range_slider':
-        return _buildRangeSliderContent(context);
+        content = _buildRangeSliderContent(context);
+        break;
       case 'date_picker':
-        return _buildDatePickerContent(context);
+        content = _buildDatePickerContent(context);
+        break;
       case 'time_picker':
-        return _buildTimePickerContent(context);
+        content = _buildTimePickerContent(context);
+        break;
       case 'datetime_picker':
-        return _buildDateTimePickerContent(context);
+        content = _buildDateTimePickerContent(context);
+        break;
       case 'file_upload':
-        return _buildFileUploadContent(context);
+        content = _buildFileUploadContent(context);
+        break;
       default:
-        return Center(
+        content = Center(
           child: Padding(
             padding: const EdgeInsets.all(32),
             child: Column(
@@ -494,7 +607,28 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
             ),
           ),
         );
+        break;
     }
+
+    if (_selectedId == _overviewId || _selectedId == null) {
+      return content;
+    }
+    return _buildComponentFrame(context, content);
+  }
+
+  Widget _buildComponentFrame(BuildContext context, Widget child) {
+    final cs = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _DashedBorderContainer(
+          color: cs.outline.withValues(alpha: 0.65),
+          borderRadius: 12,
+          padding: const EdgeInsets.all(16),
+          child: SizedBox(width: double.infinity, child: child),
+        ),
+      ],
+    );
   }
 
   Widget _contentSection(
@@ -552,7 +686,7 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Select seed color or preferred corner radius and see immediately how it looks. '
+          'Select seed color, preferred corner radius, or font and see immediately how it looks. '
               'Use the sidebar to explore foundations, actions, data display, and forms.',
           style: theme.textTheme.bodyLarge?.copyWith(
             color: cs.onSurfaceVariant,
@@ -643,6 +777,22 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
                   ),
                 ),
               ],
+            ),
+          ],
+        ),
+        _contentSection(
+          context,
+          title: 'Font',
+          subtitle: 'Select a font family for the app typography.',
+          topPadding: 32,
+          children: [
+            SizedBox(
+              width: 280,
+              child: _FontAutocomplete(
+                getFontOptions: widget.getFontOptions,
+                value: widget.selectedFontId,
+                onChanged: widget.onFontChanged,
+              ),
             ),
           ],
         ),
@@ -1974,6 +2124,149 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
     );
   }
 
+  void _openSeedColorDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => _SeedColorPickerDialog(
+        seedColor: widget.seedColor,
+        onSeedColorChanged: widget.onSeedColorChanged,
+        onClose: () => Navigator.of(dialogContext).pop(),
+        dialogContext: dialogContext,
+        onOpenColorWheel: () => _openColorWheelPicker(context),
+        recentColors: _recentPickerColors,
+        onAddToRecent: (color) => setState(() {
+          final next = _addToRecent(_recentPickerColors, color);
+          _recentPickerColors
+            ..clear()
+            ..addAll(next);
+        }),
+      ),
+    );
+  }
+
+  void _openRadiusDialog(BuildContext context) {
+    final initialRadius = widget.customRadius ?? _radiusSizeToNumber(widget.radiusSize);
+    double localRadius = initialRadius;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setStateDialog) => AlertDialog(
+            title: const Text('Corner radius'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Default radius for buttons, fields, and cards. Changes apply immediately.',
+                  style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+                const SizedBox(height: 20),
+                VSegmented<VRadiusSize>(
+                  value: widget.radiusSize,
+                  onChanged: (v) {
+                    widget.onRadiusSizeChanged(v);
+                    Navigator.of(ctx).pop();
+                  },
+                  options: const [
+                    VSegmentOption(value: VRadiusSize.none, label: 'None'),
+                    VSegmentOption(value: VRadiusSize.sm, label: 'SM'),
+                    VSegmentOption(value: VRadiusSize.md, label: 'MD'),
+                    VSegmentOption(value: VRadiusSize.lg, label: 'LG'),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Custom radius (0–200): ${localRadius.round()}',
+                  style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+                VSlider(
+                  value: localRadius,
+                  onChanged: widget.onCustomRadiusChanged == null
+                      ? null
+                      : (v) {
+                          setStateDialog(() => localRadius = v);
+                          widget.onCustomRadiusChanged?.call(v);
+                        },
+                  min: 0,
+                  max: 200,
+                  divisions: 200,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Close'),
+              ),
+            ],
+            contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+            actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+          ),
+        );
+      },
+    );
+  }
+
+  void _openFontPickerDialog(BuildContext context) {
+    final options = widget.getFontOptions();
+    showDialog<void>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Font'),
+          content: SizedBox(
+            width: 360,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 360),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: options.length,
+                itemBuilder: (context, index) {
+                  final option = options[index];
+                  final isSelected = option.id == widget.selectedFontId;
+                  final style = Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontFamily: option.fontFamily,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                      );
+                  return ListTile(
+                    leading: isSelected ? const Icon(Icons.check) : const SizedBox.shrink(),
+                    title: Text(option.name, style: style),
+                    onTap: () {
+                      widget.onFontChanged(option.id, option.textThemeBuilder);
+                      Navigator.of(ctx).pop();
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _openComponentSearch(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ComponentShowcaseScreen(
+          isDarkMode: widget.isDarkMode,
+          onDarkModeChanged: widget.onDarkModeChanged,
+        ),
+      ),
+    );
+  }
+
   Widget _colorChip(BuildContext context, String label, Color color) {
     final textColor = color.computeLuminance() > 0.55 ? Colors.black : Colors.white;
     return Container(
@@ -2077,6 +2370,86 @@ class _SidebarTile extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _DashedBorderContainer extends StatelessWidget {
+  const _DashedBorderContainer({
+    required this.child,
+    required this.color,
+    this.padding = const EdgeInsets.all(12),
+    this.borderRadius = 10,
+  });
+
+  final Widget child;
+  final Color color;
+  final EdgeInsets padding;
+  final double borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: _DashedRRectPainter(
+        color: color,
+        borderRadius: borderRadius,
+        strokeWidth: 1,
+        dashLength: 6,
+        gapLength: 4,
+      ),
+      child: Padding(
+        padding: padding,
+        child: child,
+      ),
+    );
+  }
+}
+
+class _DashedRRectPainter extends CustomPainter {
+  const _DashedRRectPainter({
+    required this.color,
+    required this.borderRadius,
+    required this.strokeWidth,
+    required this.dashLength,
+    required this.gapLength,
+  });
+
+  final Color color;
+  final double borderRadius;
+  final double strokeWidth;
+  final double dashLength;
+  final double gapLength;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.isEmpty) return;
+    final rect = Offset.zero & size;
+    final rrect = RRect.fromRectAndRadius(
+      rect.deflate(strokeWidth / 2),
+      Radius.circular(borderRadius),
+    );
+    final path = Path()..addRRect(rrect);
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+
+    for (final metric in path.computeMetrics()) {
+      var distance = 0.0;
+      while (distance < metric.length) {
+        final next = min(distance + dashLength, metric.length);
+        canvas.drawPath(metric.extractPath(distance, next), paint);
+        distance += dashLength + gapLength;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedRRectPainter oldDelegate) {
+    return color != oldDelegate.color ||
+        borderRadius != oldDelegate.borderRadius ||
+        strokeWidth != oldDelegate.strokeWidth ||
+        dashLength != oldDelegate.dashLength ||
+        gapLength != oldDelegate.gapLength;
   }
 }
 
