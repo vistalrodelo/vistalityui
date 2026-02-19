@@ -234,6 +234,7 @@ class _SatValTrianglePainter extends CustomPainter {
 /// A reusable color wheel picker: hue ring, saturation/value triangle, hex input,
 /// optional common and recent color chips, preview strip, and Cancel/Apply actions.
 class VColorWheelPicker extends StatefulWidget {
+  /// Creates a [VColorWheelPicker].
   const VColorWheelPicker({
     super.key,
     required this.initialColor,
@@ -427,7 +428,7 @@ class _VColorWheelPickerState extends State<VColorWheelPicker> {
               );
             }
             final color = colors[i];
-            final isSelected = _currentColor.value == color.value;
+            final isSelected = _currentColor.toARGB32() == color.toARGB32();
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: GestureDetector(
