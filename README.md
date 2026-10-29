@@ -2,7 +2,7 @@
 
 Material 3 Flutter component library with seed-based theming and controls for forms, data, navigation, and feedback.
 
-![Vistality UI playground](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/vistalityui_playground.png)
+![Vistality UI playground](https://github.com/vistalrodelo/vistalityui/raw/main/assets/vistalityui_playground.png)
 
 ## Features
 - Material 3 based theme with seed-driven color scheme
@@ -80,17 +80,17 @@ class MyApp extends StatelessWidget {
   }
 }
 ```
-![Screenshot 1](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/1.png)
+![Screenshot 1](https://github.com/vistalrodelo/vistalityui/raw/main/assets/1.png)
 
-![Screenshot 2](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/2.png)
+![Screenshot 2](https://github.com/vistalrodelo/vistalityui/raw/main/assets/2.png)
 
-![Screenshot 3](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/3.png)
+![Screenshot 3](https://github.com/vistalrodelo/vistalityui/raw/main/assets/3.png)
 
-![Screenshot 4](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/4.png)
+![Screenshot 4](https://github.com/vistalrodelo/vistalityui/raw/main/assets/4.png)
 
-![Screenshot 5](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/5.png)
+![Screenshot 5](https://github.com/vistalrodelo/vistalityui/raw/main/assets/5.png)
 
-![Screenshot 6](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/6.png)
+![Screenshot 6](https://github.com/vistalrodelo/vistalityui/raw/main/assets/6.png)
 
 ## Theme and radius
 

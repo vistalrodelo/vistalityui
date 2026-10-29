@@ -1,3 +1,7 @@
+## 3.0.1
+
+* Point the package repository and issue tracker at GitHub.
+
 ## 3.0.0
 
 * Add success, warning, and info color tokens, and a shared `VIntentColors` palette.

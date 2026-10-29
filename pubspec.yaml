@@ -1,8 +1,8 @@
 name: vistalityui
 description: "Material 3 Flutter component library with seed theming, forms, data, and feedback."
-version: 3.0.0
-repository: https://gitlab.com/mylibraries2/vistalityui
-issue_tracker: https://gitlab.com/mylibraries2/vistalityui/-/issues
+version: 3.0.1
+repository: https://github.com/vistalrodelo/vistalityui
+issue_tracker: https://github.com/vistalrodelo/vistalityui/issues
 topics:
   - ui
   - widgets
