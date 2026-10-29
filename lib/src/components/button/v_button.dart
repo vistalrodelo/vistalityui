@@ -88,6 +88,12 @@ class VButton extends StatelessWidget {
   /// Whether to show a loading spinner and disable the button.
   final bool loading;
 
+  /// Optional tooltip shown on hover and long press.
+  final String? tooltip;
+
+  /// Optional semantics label. Defaults to [label].
+  final String? semanticLabel;
+
   /// Creates a [VButton] with styling and size options.
   const VButton({
     super.key,
@@ -107,6 +113,8 @@ class VButton extends StatelessWidget {
     this.fullWidth = false,
     this.height,
     this.loading = false,
+    this.tooltip,
+    this.semanticLabel,
   });
 
   /// Whether the button is interactive.
@@ -150,7 +158,7 @@ class VButton extends StatelessWidget {
       borderOverride: borderColor,
     );
 
-    return SizedBox(
+    final button = SizedBox(
       width: fullWidth ? double.infinity : null,
       child: ConstrainedBox(
         constraints: BoxConstraints.tightFor(height: height ?? _defaultHeight),
@@ -159,6 +167,9 @@ class VButton extends StatelessWidget {
           borderRadius: radius,
           child: InkWell(
             onTap: enabled ? onPressed : null,
+            mouseCursor: enabled
+                ? SystemMouseCursors.click
+                : SystemMouseCursors.basic,
             borderRadius: radius,
             child: Container(
               padding: _padding,
@@ -173,6 +184,15 @@ class VButton extends StatelessWidget {
         ),
       ),
     );
+
+    final semantics = Semantics(
+      button: true,
+      enabled: enabled,
+      label: loading ? '${semanticLabel ?? label}, loading' : semanticLabel ?? label,
+      child: button,
+    );
+    if (tooltip == null) return semantics;
+    return Tooltip(message: tooltip!, child: semantics);
   }
 
   Widget _buildContent(VButtonStyle style) {
@@ -202,13 +222,29 @@ class VButton extends StatelessWidget {
           leading!,
           const SizedBox(width: 8),
         ],
-        Text(
-          label,
-          style: TextStyle(
-            color: style.foreground,
-            fontWeight: FontWeight.w600,
+        if (fullWidth)
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: style.foreground,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          )
+        else
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: style.foreground,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
         if (trailing != null) ...[
           const SizedBox(width: 8),
           trailing!,

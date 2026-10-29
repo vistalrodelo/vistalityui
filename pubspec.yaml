@@ -1,7 +1,17 @@
 name: vistalityui
-description: "A Material 3 Flutter UI library with seed-based theming and reusable components."
-version: 2.1.4
+description: "Material 3 Flutter component library with seed theming, forms, data, and feedback."
+version: 3.0.0
 repository: https://gitlab.com/mylibraries2/vistalityui
+issue_tracker: https://gitlab.com/mylibraries2/vistalityui/-/issues
+topics:
+  - ui
+  - widgets
+  - material3
+  - design-system
+  - components
+screenshots:
+  - description: "Playground showing themed Vistality UI components."
+    path: assets/vistalityui_playground.png
 
 # Explicitly declare supported platforms so pub.dev shows Android, iOS, desktop, web.
 # (Package has no native code; detection can otherwise be incomplete.)
@@ -15,7 +25,7 @@ platforms:
 
 environment:
   sdk: ^3.10.3
-  flutter: ">=1.17.0"
+  flutter: ">=3.32.0"
 
 dependencies:
   flutter:

@@ -29,7 +29,7 @@ Widget _maxWidthButton(Widget child) => ConstrainedBox(
 );
 
 class _AppBarSeparator extends StatelessWidget {
-  _AppBarSeparator();
+  const _AppBarSeparator();
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +120,7 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
   final List<Color> _recentPickerColors = [];
 
   static List<Color> _addToRecent(List<Color> list, Color color) {
-    final next = [color, ...list.where((c) => c.value != color.value)];
+    final next = [color, ...list.where((c) => c.toARGB32() != color.toARGB32())];
     return next.take(6).toList();
   }
 
@@ -2802,7 +2802,6 @@ class _FontAutocompleteState extends State<_FontAutocomplete> {
           focusNode: _focusNode,
           optionsBuilder: (value) => _filterOptions(value.text.trim()),
           onSelected: (id) {
-            if (id == null) return;
             final option = _optionById?[id];
             if (option != null) {
               _controller.text = id;

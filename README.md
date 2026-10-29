@@ -1,6 +1,6 @@
 # Vistality UI
 
-A reusable Flutter UI component library with a Material 3 theme foundation, opinionated defaults, and easy customization.
+Material 3 Flutter component library with seed-based theming and controls for forms, data, navigation, and feedback.
 
 ![Vistality UI playground](https://gitlab.com/mylibraries2/vistalityui/-/raw/main/assets/vistalityui_playground.png)
 
@@ -19,7 +19,7 @@ In your app’s `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  vistalityui: ^2.1.0
+  vistalityui: ^3.0.0
 ```
 
 Then run:
@@ -158,17 +158,35 @@ VTextBox(
 
 ## Component categories
 
-- Foundations: typography, theme colors
+- Foundations: spacing, durations, typography, semantic colors, radius
 - Buttons & Actions: buttons, button groups, icon buttons, menus
-- Data Display: cards, tables, lists, grids, timelines
-- Forms & Text: forms, text boxes
+- Data Display: cards, tables, lists, grids, timelines, bar chart
+- Forms & Text: forms, text boxes, `VTextFormField`
 - Inputs & Selection: dropdowns, chips, date/time pickers, sliders, segmented
-- Feedback: alerts, banners, toasts
-- Layout & Structure: header, sidebar, breadcrumbs
+- Feedback: alerts, banners, toasts, badges, progress, skeleton, empty state
+- Layout & Structure: stack, grid, responsive helpers, breadcrumbs
 - Navigation: tabs, pagination
-- Overlays: dialogs, popovers
-- Utilities: clipboard, status
-- Charts: basic charts
+- Overlays: dialogs, popovers, tooltips
+
+## Feedback
+
+```dart
+VAlert(
+  title: 'Saved',
+  message: 'Profile updated.',
+  intent: VIntent.success,
+  onClose: () {},
+);
+
+VToast.show(context, message: 'Invite sent', intent: VIntent.success);
+
+final confirmed = await VDialog.confirm(
+  context,
+  title: 'Delete project?',
+  message: 'This removes the project and its files.',
+  confirmIntent: VIntent.danger,
+);
+```
 
 ## Playground / example app
 

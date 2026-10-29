@@ -14,4 +14,7 @@ enum VIntent {
 
   /// Danger intent for destructive actions.
   danger,
+
+  /// Informational intent for neutral status messages.
+  info,
 }

@@ -52,7 +52,6 @@ class _ComponentShowcaseScreenState extends State<ComponentShowcaseScreen> {
   String? _selectedCountry;
   final List<String> _selectedFruits = [];
   String _selectedGender = 'male';
-  String? _emailError;
   bool _switchValue = false;
   double _sliderValue = 25;
   RangeValues _rangeValues = const RangeValues(20, 60);
@@ -68,6 +67,8 @@ class _ComponentShowcaseScreenState extends State<ComponentShowcaseScreen> {
   final _tableSource = _SampleTableSource();
   int? _sortColumnIndex = 0;
   bool _sortAscending = true;
+  int _page = 1;
+  bool _bannerVisible = true;
   final List<List<String>> _sortableRows = [
     ['Alice', 'Admin'],
     ['Bob', 'Editor'],
@@ -276,6 +277,7 @@ class _ComponentShowcaseScreenState extends State<ComponentShowcaseScreen> {
 
   Widget _buildThemeColorTiles(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final status = context.vColors;
     final colors = <String, Color>{
       'Primary': scheme.primary,
       'On Primary': scheme.onPrimary,
@@ -285,17 +287,20 @@ class _ComponentShowcaseScreenState extends State<ComponentShowcaseScreen> {
       'On Secondary': scheme.onSecondary,
       'Tertiary': scheme.tertiary,
       'On Tertiary': scheme.onTertiary,
-      'Background': scheme.background,
-      'On Background': scheme.onBackground,
+      'Background': scheme.surface,
+      'On Background': scheme.onSurface,
       'Surface': scheme.surface,
       'On Surface': scheme.onSurface,
-      'Surface Variant': scheme.surfaceVariant,
+      'Surface Variant': scheme.surfaceContainerHighest,
       'On Surface Variant': scheme.onSurfaceVariant,
       'Outline': scheme.outline,
       'Error': scheme.error,
       'On Error': scheme.onError,
       'Error Container': scheme.errorContainer,
       'On Error Container': scheme.onErrorContainer,
+      'Success': status.success,
+      'Warning': status.warning,
+      'Info': status.info,
     };
 
     return Wrap(
@@ -405,6 +410,145 @@ class _ComponentShowcaseScreenState extends State<ComponentShowcaseScreen> {
         _DemoItem(
           title: 'Theme Colors',
           child: _buildThemeColorTiles(context),
+        ),
+      ],
+    );
+
+    addSection(
+      'Feedback & Navigation',
+      [
+        _DemoItem(
+          title: 'Alert',
+          child: const VAlert(
+            title: 'Changes saved',
+            message: 'The profile was updated a few seconds ago.',
+            intent: VIntent.success,
+          ),
+        ),
+        _DemoItem(
+          title: 'Banner',
+          child: _bannerVisible
+              ? VBanner(
+                  message: 'Your trial ends in 3 days.',
+                  actionLabel: 'Upgrade',
+                  onAction: () => VToast.show(
+                    context,
+                    message: 'Upgrade flow would start here',
+                    intent: VIntent.primary,
+                  ),
+                  onClose: () => setState(() => _bannerVisible = false),
+                )
+              : VButton(
+                  label: 'Show banner',
+                  onPressed: () => setState(() => _bannerVisible = true),
+                ),
+        ),
+        _DemoItem(
+          title: 'Bar Chart',
+          child: const VBarChart(
+            items: [
+              VBarChartItem(label: 'Mon', value: 12),
+              VBarChartItem(label: 'Tue', value: 18),
+              VBarChartItem(label: 'Wed', value: 9),
+              VBarChartItem(label: 'Thu', value: 22),
+              VBarChartItem(label: 'Fri', value: 15),
+            ],
+          ),
+        ),
+        _DemoItem(
+          title: 'Breadcrumbs',
+          child: VBreadcrumbs(
+            items: [
+              VBreadcrumbItem(label: 'Home', onTap: () {}),
+              VBreadcrumbItem(label: 'Settings', onTap: () {}),
+              const VBreadcrumbItem(label: 'Billing'),
+            ],
+          ),
+        ),
+        _DemoItem(
+          title: 'Dialog',
+          child: VButton(
+            label: 'Delete project',
+            intent: VIntent.danger,
+            onPressed: () => VDialog.confirm(
+              context,
+              title: 'Delete project?',
+              message: 'This removes the project and its files.',
+              confirmLabel: 'Delete',
+              confirmIntent: VIntent.danger,
+            ),
+          ),
+        ),
+        _DemoItem(
+          title: 'Empty State',
+          child: VEmptyState(
+            title: 'No invoices yet',
+            message: 'Invoices appear here after the first billing cycle.',
+            actionLabel: 'Create invoice',
+            onAction: () {},
+          ),
+        ),
+        _DemoItem(
+          title: 'Pagination',
+          child: VPagination(
+            page: _page,
+            pageCount: 12,
+            onPageChanged: (page) => setState(() => _page = page),
+          ),
+        ),
+        _DemoItem(
+          title: 'Popover',
+          child: const VPopover(
+            title: 'Keyboard shortcuts',
+            content: Text('Press / to search and ? to open help.'),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Text('Shortcuts'),
+            ),
+          ),
+        ),
+        _DemoItem(
+          title: 'Progress',
+          child: const Column(
+            children: [
+              VProgress(value: 0.65, label: 'Upload'),
+              SizedBox(height: 12),
+              VSkeleton(height: 14),
+              SizedBox(height: 8),
+              VSkeleton(width: 180, height: 14),
+            ],
+          ),
+        ),
+        _DemoItem(
+          title: 'Tabs',
+          child: const VTabs(
+            tabs: [
+              VTabItem(label: 'Overview', icon: Icons.dashboard_outlined, child: Text('Overview content')),
+              VTabItem(label: 'Activity', icon: Icons.history, child: Text('Activity content')),
+              VTabItem(label: 'Settings', icon: Icons.settings_outlined, child: Text('Settings content')),
+            ],
+          ),
+        ),
+        _DemoItem(
+          title: 'Toast',
+          child: Wrap(
+            spacing: 12,
+            children: [
+              VButton(
+                label: 'Success toast',
+                intent: VIntent.success,
+                onPressed: () => VToast.show(
+                  context,
+                  message: 'Invite sent',
+                  intent: VIntent.success,
+                ),
+              ),
+              VBadge(
+                count: 3,
+                child: const Icon(Icons.notifications_outlined, size: 28),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -1423,7 +1567,7 @@ class _ComponentShowcaseScreenState extends State<ComponentShowcaseScreen> {
   }
 
   String _colorHex(Color color) {
-    return '#${color.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
+    return '#${color.toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase()}';
   }
 }
 

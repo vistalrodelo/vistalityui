@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../foundation/v_colors.dart';
 import '../../foundation/v_intent.dart';
+import '../../foundation/v_intent_colors.dart';
 import 'v_button.dart';
 
 /// Resolved colors for a [VButton] variant and intent.
@@ -31,9 +31,7 @@ class VButtonStyle {
     Color? foregroundOverride,
     Color? borderOverride,
   }) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    final vc = theme.extension<VColors>() ?? VColors.fromScheme(cs);
+    final cs = Theme.of(context).colorScheme;
 
     if (!enabled) {
       final disabledBackground = cs.onSurface.withValues(alpha: 0.12);
@@ -47,40 +45,12 @@ class VButtonStyle {
       );
     }
 
-    final base = () {
-      switch (intent) {
-        case VIntent.primary:
-          return VButtonStyle(
-            background: vc.primary,
-            foreground: vc.onPrimary,
-            border: vc.primary,
-          );
-        case VIntent.secondary:
-          return VButtonStyle(
-            background: vc.secondary,
-            foreground: vc.onSecondary,
-            border: vc.secondary,
-          );
-        case VIntent.success:
-          return VButtonStyle(
-            background: vc.tertiary,
-            foreground: vc.onTertiary,
-            border: vc.tertiary,
-          );
-        case VIntent.warning:
-          return VButtonStyle(
-            background: cs.secondaryContainer,
-            foreground: cs.onSecondaryContainer,
-            border: cs.secondaryContainer,
-          );
-        case VIntent.danger:
-          return VButtonStyle(
-            background: vc.error,
-            foreground: vc.onError,
-            border: vc.error,
-          );
-      }
-    }();
+    final palette = VIntentColors.resolve(context, intent);
+    final base = VButtonStyle(
+      background: palette.background,
+      foreground: palette.foreground,
+      border: palette.border,
+    );
 
     final resolved = () {
       switch (variant) {

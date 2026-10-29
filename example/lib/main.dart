@@ -20,24 +20,10 @@ class VistalityUIPlayground extends StatefulWidget {
   State<VistalityUIPlayground> createState() => _VistalityUIPlaygroundState();
 }
 
-/// Numeric radius for each preset (used for slider when no custom value).
-double _radiusSizeToNumber(VRadiusSize size) {
-  switch (size) {
-    case VRadiusSize.none:
-      return 0;
-    case VRadiusSize.sm:
-      return 6;
-    case VRadiusSize.md:
-      return 10;
-    case VRadiusSize.lg:
-      return 16;
-  }
-}
-
 class _VistalityUIPlaygroundState extends State<VistalityUIPlayground> {
   bool _isDarkMode = false;
   Color _seedColor = kDefaultSeedColor;
-  VRadiusSize _radiusSize = VRadiusSize.lg;
+  VRadiusSize _radiusSize = VRadiusSize.sm;
   double? _customRadius; // when set, theme uses this instead of _radiusSize
   String _selectedFontId = 'Poppins';
   TextTheme Function(TextTheme) _textThemeBuilder = GoogleFonts.poppinsTextTheme;

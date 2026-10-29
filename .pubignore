@@ -1,0 +1,31 @@
+# Keep in sync with .gitignore. When this file exists, pub publish
+# uses it instead of .gitignore.
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+*.iml
+*.ipr
+*.iws
+.idea/
+/pubspec.lock
+**/doc/api/
+.dart_tool/
+.flutter-plugins-dependencies
+/build/
+/coverage/
+
+# Example app build output and plugin checkouts.
+example/**/build/
+example/**/.gradle/
+example/**/ephemeral/
+example/**/.symlinks/
+example/**/Pods/
+example/**/.plugin_symlinks/
+example/pubspec.lock

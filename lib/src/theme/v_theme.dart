@@ -64,7 +64,85 @@ ThemeData buildTheme(
       primaryTextTheme: textThemeBuilder(themed.primaryTextTheme),
     );
   }
-  return themed;
+  return themed.copyWith(
+    appBarTheme: AppBarTheme(
+      backgroundColor: adjustedScheme.surface,
+      foregroundColor: adjustedScheme.onSurface,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      centerTitle: false,
+    ),
+    scaffoldBackgroundColor: adjustedScheme.surface,
+    dividerTheme: DividerThemeData(color: adjustedScheme.outlineVariant),
+    cardTheme: CardThemeData(
+      elevation: 0,
+      color: adjustedScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: vRadius.defaultBorderRadius(),
+        side: BorderSide(color: adjustedScheme.outlineVariant),
+      ),
+    ),
+    dialogTheme: DialogThemeData(
+      shape: dialogShape,
+      backgroundColor: adjustedScheme.surface,
+    ),
+    snackBarTheme: SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      shape: dialogShape,
+    ),
+    tooltipTheme: TooltipThemeData(
+      decoration: BoxDecoration(
+        color: adjustedScheme.inverseSurface,
+        borderRadius: vRadius.borderRadius(VRadiusSize.sm),
+      ),
+      textStyle: TextStyle(color: adjustedScheme.onInverseSurface),
+    ),
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: adjustedScheme.primary,
+    ),
+    chipTheme: ChipThemeData(
+      shape: RoundedRectangleBorder(borderRadius: vRadius.defaultBorderRadius()),
+      side: BorderSide(color: adjustedScheme.outlineVariant),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      isDense: true,
+      fillColor: adjustedScheme.surface,
+      border: OutlineInputBorder(borderRadius: vRadius.defaultBorderRadius()),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: vRadius.defaultBorderRadius(),
+        borderSide: BorderSide(color: adjustedScheme.outline),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: vRadius.defaultBorderRadius(),
+        borderSide: BorderSide(color: adjustedScheme.primary, width: 2),
+      ),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        shape: dialogShape,
+        minimumSize: const Size(64, 40),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        shape: dialogShape,
+        minimumSize: const Size(64, 40),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        shape: dialogShape,
+        minimumSize: const Size(64, 40),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        shape: dialogShape,
+        minimumSize: const Size(64, 40),
+      ),
+    ),
+  );
 }
 
 VRadius _buildVRadius(Object defaultRadius) {
