@@ -11,9 +11,6 @@ class PlaygroundFontOption {
   final String id;
   final String name;
   final TextTheme Function(TextTheme) textThemeBuilder;
-
-  /// Resolve fontFamily on demand (for list tile); avoids building 1000+ styles at init.
-  String? get fontFamily => GoogleFonts.getFont(id).fontFamily;
 }
 
 List<PlaygroundFontOption>? _cachedFontOptions;
@@ -25,9 +22,7 @@ List<PlaygroundFontOption> get kPlaygroundFontOptions {
     return keys.map((id) => PlaygroundFontOption(
       id: id,
       name: id,
-      textThemeBuilder: (base) => base.apply(
-        fontFamily: GoogleFonts.getFont(id).fontFamily,
-      ),
+      textThemeBuilder: (base) => GoogleFonts.getTextTheme(id, base),
     )).toList();
   }();
   return _cachedFontOptions!;

@@ -19,7 +19,7 @@ In your app’s `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  vistalityui: ^3.0.0
+  vistalityui: ^3.1.0
 ```
 
 Then run:

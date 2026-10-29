@@ -1,3 +1,8 @@
+## 3.1.0
+
+* Update `image_cropper` to the current release.
+* Remove `desktop_drop`. It cannot resolve alongside current `file_selector`, which kept the pub.dev dependency score at 150. Web drag-and-drop still uses `flutter_dropzone`. Other platforms pick files with the upload button.
+
 ## 3.0.1
 
 * Point the package repository and issue tracker at GitHub.

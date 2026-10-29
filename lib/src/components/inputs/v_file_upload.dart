@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
-import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -131,23 +130,17 @@ class _VFileUploadState extends State<VFileUpload> {
     final hasPreview = _files.isNotEmpty;
     return SizedBox(
       height: _dropAreaHeight,
-      child: DropTarget(
-        enable: widget.enabled,
-        onDragEntered: (_) => setState(() => _isDragging = true),
-        onDragExited: (_) => setState(() => _isDragging = false),
-        onDragDone: widget.enabled ? _handleDesktopDrop : null,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          padding: hasPreview ? EdgeInsets.zero : const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: hasPreview
-                ? BorderRadius.zero
-                : context.vRadius.defaultBorderRadius(),
-            border: hasPreview ? null : Border.all(color: borderColor),
-            color: background,
-          ),
-          child: SizedBox.expand(child: _buildDropPreview(context)),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: hasPreview ? EdgeInsets.zero : const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: hasPreview
+              ? BorderRadius.zero
+              : context.vRadius.defaultBorderRadius(),
+          border: hasPreview ? null : Border.all(color: borderColor),
+          color: background,
         ),
+        child: SizedBox.expand(child: _buildDropPreview(context)),
       ),
     );
   }
@@ -199,7 +192,11 @@ class _VFileUploadState extends State<VFileUpload> {
             const Icon(Icons.image_outlined, size: 36, color: Colors.grey),
             const SizedBox(height: 8),
             Text(
-              widget.enabled ? 'Drag & drop files here' : 'Upload disabled',
+              !widget.enabled
+                  ? 'Upload disabled'
+                  : kIsWeb
+                      ? 'Drag & drop files here'
+                      : 'Choose a file',
               style: const TextStyle(color: Colors.grey),
             ),
           ],
@@ -422,17 +419,6 @@ class _VFileUploadState extends State<VFileUpload> {
     return completer.future;
   }
 
-  Future<void> _handleDesktopDrop(DropDoneDetails details) async {
-    final dropped = _filterDroppedFiles(details.files);
-    if (dropped.isEmpty) {
-      setState(() => _isDragging = false);
-      return;
-    }
-    final accepted = widget.allowMultiple ? dropped : [dropped.first];
-    await _setFiles(accepted);
-    setState(() => _isDragging = false);
-  }
-
   void _handleWebDropFile(DropzoneFileInterface file) {
     _handleWebDrop([file]);
   }
@@ -522,12 +508,6 @@ class _VFileUploadState extends State<VFileUpload> {
     if (_activeWebUrls.remove(url)) {
       _dropzoneController?.releaseFileUrl(url);
     }
-  }
-
-  List<XFile> _filterDroppedFiles(List<XFile> files) {
-    final allowed = widget.allowedTypes;
-    if (allowed == null || allowed.isEmpty) return files;
-    return files.where(_matchesAllowedTypes).toList();
   }
 
   bool _matchesAllowedTypes(XFile file) {

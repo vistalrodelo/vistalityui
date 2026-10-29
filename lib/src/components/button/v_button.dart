@@ -171,10 +171,23 @@ class VButton extends StatelessWidget {
                 ? SystemMouseCursors.click
                 : SystemMouseCursors.basic,
             borderRadius: radius,
+            overlayColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.pressed)) {
+                return style.foreground.withValues(alpha: 0.14);
+              }
+              if (states.contains(WidgetState.hovered)) {
+                return style.foreground.withValues(alpha: 0.08);
+              }
+              return null;
+            }),
             child: Container(
               padding: _padding,
               decoration: BoxDecoration(
-                border: Border.all(color: style.border),
+                border: Border.all(
+                  color: variant == VButtonVariant.solid && borderColor == null
+                      ? Colors.transparent
+                      : style.border,
+                ),
                 borderRadius: radius,
               ),
               alignment: Alignment.center,
@@ -229,27 +242,36 @@ class VButton extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: style.foreground,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          )
+            style: _labelStyle(style),
+          ),
+        )
         else
           Text(
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: style.foreground,
-              fontWeight: FontWeight.w600,
-            ),
+            style: _labelStyle(style),
           ),
         if (trailing != null) ...[
           const SizedBox(width: 8),
           trailing!,
         ],
       ],
+    );
+  }
+
+  TextStyle _labelStyle(VButtonStyle style) {
+    final fontSize = switch (size) {
+      VButtonSize.sm => 13.0,
+      VButtonSize.md => 14.0,
+      VButtonSize.lg => 15.0,
+    };
+    return TextStyle(
+      color: style.foreground,
+      fontWeight: FontWeight.w600,
+      fontSize: fontSize,
+      letterSpacing: -0.1,
+      height: 1.1,
     );
   }
 

@@ -72,7 +72,7 @@ ThemeData buildTheme(
       scrolledUnderElevation: 0,
       centerTitle: false,
     ),
-    scaffoldBackgroundColor: adjustedScheme.surface,
+    scaffoldBackgroundColor: adjustedScheme.surfaceContainerLowest,
     dividerTheme: DividerThemeData(color: adjustedScheme.outlineVariant),
     cardTheme: CardThemeData(
       elevation: 0,

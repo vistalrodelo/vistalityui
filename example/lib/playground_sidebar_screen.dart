@@ -1,10 +1,10 @@
-import 'dart:math' show min;
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:vistalityui/vistalityui.dart';
 
-import 'component_showcase_screen.dart';
 import 'playground_fonts.dart';
 
 /// Preset seed colors from well-known brands; theme is generated from the selected one.
@@ -22,29 +22,15 @@ String _colorToHex(Color c) {
 }
 
 const double _kPlaygroundButtonMaxWidth = 400;
+const double _kChromeHeight = 64;
+const double _kContentMaxWidth = 960;
+
+double _contentPadding(double width) => width >= VBreakpoints.lg ? 32 : 20;
 
 Widget _maxWidthButton(Widget child) => ConstrainedBox(
   constraints: const BoxConstraints(maxWidth: _kPlaygroundButtonMaxWidth),
   child: child,
 );
-
-class _AppBarSeparator extends StatelessWidget {
-  const _AppBarSeparator();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width: 1,
-        height: 44,
-        margin: const EdgeInsets.symmetric(horizontal: 8),
-        decoration: BoxDecoration(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.6),
-        ),
-      ),
-    );
-  }
-}
 
 /// Playground screen with sidebar navigation and main content area,
 /// matching the layout from the README image.
@@ -118,6 +104,8 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
   TimeOfDay? _sidebarTime;
   DateTime? _sidebarDateTime;
   final List<Color> _recentPickerColors = [];
+  final TextEditingController _navFilterController = TextEditingController();
+  String _navQuery = '';
 
   static List<Color> _addToRecent(List<Color> list, Color color) {
     final next = [color, ...list.where((c) => c.toARGB32() != color.toARGB32())];
@@ -147,6 +135,7 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
     _sidebarDateController.dispose();
     _sidebarTimeController.dispose();
     _sidebarDateTimeController.dispose();
+    _navFilterController.dispose();
     super.dispose();
   }
 
@@ -165,49 +154,41 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
   Widget build(BuildContext context) {
     final isWide = _isWideLayout(context);
 
+    final page = _currentPage();
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        toolbarHeight: 78.4, // default 56 * 1.4
-        leading: isWide
-            ? null
-            : IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-          tooltip: 'Menu',
-        ),
-        title: Text(
-          'VistalityUI',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
-        ),
-        actions: isWide
-            ? _buildWideAppBarActions(context)
-            : _buildCompactAppBarActions(context),
-      ),
+      backgroundColor: cs.surface,
       drawer: isWide ? null : _buildDrawer(context),
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (isWide) _buildSidebar(context),
           Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final maxContentWidth = 880.0;
-                final padding = MediaQuery.sizeOf(context).width >= VBreakpoints.lg
-                    ? 24.0
-                    : 16.0;
-                return SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(padding, padding + 8, padding, padding + 24),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: maxContentWidth),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: _buildContent(context),
-                      ),
-                    ),
+            child: Column(
+              children: [
+                _buildContentHeader(context, page, isWide),
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final padding = _contentPadding(constraints.maxWidth);
+                      return SingleChildScrollView(
+                        padding: EdgeInsets.fromLTRB(padding, 28, padding, 48),
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: _kContentMaxWidth),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: _buildContent(context),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+              ],
             ),
           ),
         ],
@@ -215,124 +196,179 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
     );
   }
 
-  List<Widget> _buildWideAppBarActions(BuildContext context) {
-    return [
-      _SeedColorButton(
-        seedColor: widget.seedColor,
-        onSeedColorChanged: widget.onSeedColorChanged,
-        onOpenColorWheel: () => _openColorWheelPicker(context),
-        recentColors: _recentPickerColors,
-        onAddToRecent: (color) => setState(() {
-          final next = _addToRecent(_recentPickerColors, color);
-          _recentPickerColors
-            ..clear()
-            ..addAll(next);
-        }),
+  ({String section, String label}) _currentPage() {
+    for (final section in _navSections()) {
+      for (final item in section.items) {
+        if (item.id == _selectedId) {
+          return (section: section.title, label: item.label);
+        }
+      }
+    }
+    return (section: 'Library', label: 'Overview');
+  }
+
+  Widget _buildContentHeader(
+    BuildContext context,
+    ({String section, String label}) page,
+    bool isWide,
+  ) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: cs.surface,
+        border: Border(bottom: BorderSide(color: cs.outlineVariant)),
       ),
-      _AppBarSeparator(),
-      _RadiusChip(
-        radiusSize: widget.radiusSize,
-        onRadiusSizeChanged: widget.onRadiusSizeChanged,
-        customRadius: widget.customRadius,
-        onCustomRadiusChanged: widget.onCustomRadiusChanged,
+      child: SizedBox(
+        height: _kChromeHeight,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final padding = _contentPadding(constraints.maxWidth);
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: padding),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: _kContentMaxWidth),
+                  child: Row(
+                    children: [
+                      if (!isWide)
+                        IconButton(
+                          icon: const Icon(Icons.menu),
+                          tooltip: 'Menu',
+                          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                        ),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              page.section,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: cs.onSurfaceVariant,
+                                fontWeight: FontWeight.w600,
+                                height: 1.1,
+                              ),
+                            ),
+                            Text(
+                              page.label,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.3,
+                                height: 1.15,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+              if (!isWide)
+                PopupMenuButton<String>(
+                  tooltip: 'Playground options',
+                  onSelected: (value) {
+                    switch (value) {
+                      case _mobileMenuSeedColor:
+                        _openColorWheelPicker(context);
+                        break;
+                      case _mobileMenuCornerRadius:
+                        _openRadiusDialog(context);
+                        break;
+                      case _mobileMenuFont:
+                        _openFontPickerDialog(context);
+                        break;
+                      case _mobileMenuDarkMode:
+                        widget.onDarkModeChanged(!widget.isDarkMode);
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem<String>(
+                      value: _mobileMenuSeedColor,
+                      child: Text('Seed color'),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: _mobileMenuCornerRadius,
+                      child: Text('Corner radius'),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: _mobileMenuFont,
+                      child: Text('Font'),
+                    ),
+                    PopupMenuItem<String>(
+                      value: _mobileMenuDarkMode,
+                      child: Text(widget.isDarkMode ? 'Use light mode' : 'Use dark mode'),
+                    ),
+                  ],
+                ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
-      _AppBarSeparator(),
-      _FontAutocomplete(
-        getFontOptions: widget.getFontOptions,
-        value: widget.selectedFontId,
-        onChanged: widget.onFontChanged,
+    );
+  }
+
+  Widget _buildBrandHeader(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: cs.surface,
+        border: Border(bottom: BorderSide(color: cs.outlineVariant)),
       ),
-      _AppBarSeparator(),
-      VButton(
-        label: 'Search components',
-        prefixIcon: const Icon(Icons.search),
-        variant: VButtonVariant.text,
-        onPressed: () => _openComponentSearch(context),
-      ),
-      _AppBarSeparator(),
-      const SizedBox(width: 50),
-      Padding(
-        padding: const EdgeInsets.only(right: 12),
-        child: Center(
-          child: VSwitch(
-            value: widget.isDarkMode,
-            onChanged: widget.onDarkModeChanged,
-            label: 'Dark mode',
+      child: SizedBox(
+        height: _kChromeHeight,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: cs.primary,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'V',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: cs.onPrimary,
+                    fontWeight: FontWeight.w800,
+                    height: 1,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Vistality',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.3,
+                      height: 1.1,
+                    ),
+                  ),
+                  Text(
+                    'Playground',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: cs.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
-      const SizedBox(width: 40),
-    ];
-  }
-
-  List<Widget> _buildCompactAppBarActions(BuildContext context) {
-    return [
-      IconButton(
-        icon: const Icon(Icons.search),
-        tooltip: 'Search components',
-        onPressed: () => _openComponentSearch(context),
-      ),
-      PopupMenuButton<String>(
-        tooltip: 'Playground options',
-        onSelected: (value) {
-          switch (value) {
-            case _mobileMenuSeedColor:
-              _openSeedColorDialog(context);
-              break;
-            case _mobileMenuCornerRadius:
-              _openRadiusDialog(context);
-              break;
-            case _mobileMenuFont:
-              _openFontPickerDialog(context);
-              break;
-            case _mobileMenuDarkMode:
-              widget.onDarkModeChanged(!widget.isDarkMode);
-              break;
-          }
-        },
-        itemBuilder: (context) => [
-          const PopupMenuItem<String>(
-            value: _mobileMenuSeedColor,
-            child: ListTile(
-              leading: Icon(Icons.palette_outlined),
-              title: Text('Seed color'),
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            ),
-          ),
-          const PopupMenuItem<String>(
-            value: _mobileMenuCornerRadius,
-            child: ListTile(
-              leading: Icon(Icons.rounded_corner),
-              title: Text('Corner radius'),
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            ),
-          ),
-          const PopupMenuItem<String>(
-            value: _mobileMenuFont,
-            child: ListTile(
-              leading: Icon(Icons.font_download_outlined),
-              title: Text('Font'),
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            ),
-          ),
-          PopupMenuItem<String>(
-            value: _mobileMenuDarkMode,
-            child: ListTile(
-              leading: Icon(
-                widget.isDarkMode ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
-              ),
-              title: Text(widget.isDarkMode ? 'Dark mode: on' : 'Dark mode: off'),
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            ),
-          ),
-        ],
-      ),
-      const SizedBox(width: 4),
-    ];
+    );
   }
 
   Widget _buildDrawer(BuildContext context) {
@@ -344,24 +380,108 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
   }
 
   Widget _buildSidebar(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    final vc = theme.extension<VColors>() ?? VColors.fromScheme(cs);
+    final cs = Theme.of(context).colorScheme;
     return Container(
-      width: 240,
+      width: 280,
       decoration: BoxDecoration(
-        color: cs.surfaceContainerLow,
-        border: Border(right: BorderSide(color: vc.outline.withValues(alpha: 0.2))),
+        color: cs.surface,
+        border: Border(right: BorderSide(color: cs.outlineVariant)),
       ),
       child: _buildSidebarContent(context),
     );
   }
 
-  Widget _buildSidebarContent(BuildContext context) {
+  Widget _buildAppearancePanel(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final quiet = theme.textTheme.labelSmall?.copyWith(
+      color: cs.onSurfaceVariant,
+      fontWeight: FontWeight.w600,
+    );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: cs.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Theme',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    tooltip: widget.isDarkMode ? 'Light mode' : 'Dark mode',
+                    onPressed: () => widget.onDarkModeChanged(!widget.isDarkMode),
+                    icon: Icon(
+                      widget.isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                      size: 18,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text('Color', style: quiet),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  for (final color in _kSeedOptions)
+                    _SeedSwatch(
+                      color: color,
+                      selected: widget.seedColor.toARGB32() == color.toARGB32(),
+                      onTap: () => widget.onSeedColorChanged(color),
+                    ),
+                  _SeedSwatch(
+                    color: cs.surfaceContainerHighest,
+                    selected: !_kSeedOptions.any((c) => c.toARGB32() == widget.seedColor.toARGB32()),
+                    icon: Icons.colorize_outlined,
+                    onTap: () => _openColorWheelPicker(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text('Radius', style: quiet),
+              const SizedBox(height: 8),
+              VSegmented<VRadiusSize>(
+                value: widget.radiusSize,
+                onChanged: widget.onRadiusSizeChanged,
+                options: const [
+                  VSegmentOption(value: VRadiusSize.none, label: '0'),
+                  VSegmentOption(value: VRadiusSize.sm, label: 'S'),
+                  VSegmentOption(value: VRadiusSize.md, label: 'M'),
+                  VSegmentOption(value: VRadiusSize.lg, label: 'L'),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _FontDropdown(
+                getFontOptions: widget.getFontOptions,
+                value: widget.selectedFontId,
+                onChanged: widget.onFontChanged,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-    const sections = [
+  List<_SidebarSection> _navSections() {
+    return const [
       _SidebarSection(
         title: 'Overview',
         items: [
@@ -433,29 +553,78 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
         ],
       ),
     ];
+  }
 
-    return ListView(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      children: [
-        for (final section in sections) ...[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-            child: Text(
-              section.title,
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: cs.onSurfaceVariant,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+  List<_SidebarSection> _visibleNavSections() {
+    final query = _navQuery.trim().toLowerCase();
+    if (query.isEmpty) return _navSections();
+    return [
+      for (final section in _navSections())
+        if (section.items.any((item) => item.label.toLowerCase().contains(query)))
+          _SidebarSection(
+            title: section.title,
+            items: [
+              for (final item in section.items)
+                if (item.label.toLowerCase().contains(query)) item,
+            ],
           ),
-          for (final item in section.items)
-            _SidebarTile(
-              label: item.label,
-              icon: item.icon,
-              selected: _selectedId == item.id,
-              onTap: () => _onSidebarItemTap(item.id),
-            ),
-        ],
+    ];
+  }
+
+  Widget _buildSidebarContent(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    return Column(
+      children: [
+        _buildBrandHeader(context),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+          child: VTextBox(
+            controller: _navFilterController,
+            label: null,
+            hint: 'Find a component',
+            filled: true,
+            controlHeight: 40,
+            prefixIcon: Icons.search,
+            onChanged: (value) => setState(() => _navQuery = value),
+          ),
+        ),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 16),
+            children: [
+              if (_visibleNavSections().isEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
+                  child: Text(
+                    'No components match',
+                    style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                  ),
+                ),
+              for (final section in _visibleNavSections()) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 14, 12, 4),
+                  child: Text(
+                    section.title,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: cs.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                for (final item in section.items)
+                  _SidebarTile(
+                    label: item.label,
+                    icon: item.icon,
+                    selected: _selectedId == item.id,
+                    onTap: () => _onSidebarItemTap(item.id),
+                  ),
+              ],
+            ],
+          ),
+        ),
+        _buildAppearancePanel(context),
       ],
     );
   }
@@ -610,25 +779,7 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
         break;
     }
 
-    if (_selectedId == _overviewId || _selectedId == null) {
-      return content;
-    }
-    return _buildComponentFrame(context, content);
-  }
-
-  Widget _buildComponentFrame(BuildContext context, Widget child) {
-    final cs = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _DashedBorderContainer(
-          color: cs.outline.withValues(alpha: 0.65),
-          borderRadius: 12,
-          padding: const EdgeInsets.all(16),
-          child: SizedBox(width: double.infinity, child: child),
-        ),
-      ],
-    );
+    return content;
   }
 
   Widget _contentSection(
@@ -636,33 +787,45 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
         required String title,
         String? subtitle,
         required List<Widget> children,
-        double topPadding = 32,
+        double topPadding = 16,
       }) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final radius = context.vRadius.defaultBorderRadius();
     return Padding(
       padding: EdgeInsets.only(top: topPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurface,
-              letterSpacing: 0.2,
-            ),
-          ),
-          if (subtitle != null) ...[
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: cs.surfaceContainerLow,
+          borderRadius: radius,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                title,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.2,
+                ),
               ),
-            ),
-          ],
-          SizedBox(height: subtitle != null ? 16 : 12),
-          ...children,
-        ],
+              if (subtitle != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: cs.onSurfaceVariant,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 16),
+              ...children,
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -673,147 +836,18 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Text(
-            'Design system overview',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.25,
-              color: cs.onSurface,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
         Text(
-          'Select seed color, preferred corner radius, or font and see immediately how it looks. '
-              'Use the sidebar to explore foundations, actions, data display, and forms.',
+          'Color, type, radius, and dark mode in the sidebar apply to every control below.',
           style: theme.textTheme.bodyLarge?.copyWith(
             color: cs.onSurfaceVariant,
-            height: 1.5,
+            height: 1.45,
           ),
-        ),
-        _contentSection(
-          context,
-          title: 'Seed color',
-          subtitle: 'Select a color to generate the theme (ColorScheme.fromSeed).',
-          topPadding: 32,
-          children: [
-            Wrap(
-              spacing: 12,
-              runSpacing: 16,
-              children: [
-                ..._kSeedOptions.map((color) {
-                  final isSelected = widget.seedColor == color;
-                  return GestureDetector(
-                    onTap: () => widget.onSeedColorChanged(color),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isSelected ? cs.outline : Colors.transparent,
-                              width: 3,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.2),
-                                blurRadius: 2,
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _colorToHex(color),
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: cs.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-                GestureDetector(
-                  onTap: () => _openColorWheelPicker(context),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: cs.outline),
-                          gradient: SweepGradient(
-                            center: Alignment.center,
-                            colors: const [
-                              Color(0xFFFF0000),
-                              Color(0xFFFFFF00),
-                              Color(0xFF00FF00),
-                              Color(0xFF00FFFF),
-                              Color(0xFF0000FF),
-                              Color(0xFFFF00FF),
-                              Color(0xFFFF0000),
-                            ],
-                          ),
-                        ),
-                        child: Icon(Icons.touch_app, size: 18, color: cs.onSurface),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Color wheel',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: cs.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        _contentSection(
-          context,
-          title: 'Font',
-          subtitle: 'Select a font family for the app typography.',
-          topPadding: 32,
-          children: [
-            SizedBox(
-              width: 280,
-              child: _FontAutocomplete(
-                getFontOptions: widget.getFontOptions,
-                value: widget.selectedFontId,
-                onChanged: widget.onFontChanged,
-              ),
-            ),
-          ],
-        ),
-        _contentSection(
-          context,
-          title: 'Dark mode',
-          subtitle: 'Toggle light or dark theme for the whole app.',
-          topPadding: 32,
-          children: [
-            VSwitch(
-              value: widget.isDarkMode,
-              onChanged: widget.onDarkModeChanged,
-              label: 'Dark mode',
-            ),
-          ],
         ),
         _contentSection(
           context,
           title: 'Corner radius',
-          subtitle: 'Default corner radius for buttons, fields, and cards (none, sm, md, lg).',
-          topPadding: 32,
+          subtitle: 'Presets live in the sidebar. Drag here for a custom value.',
+          topPadding: 20,
           children: [
             SizedBox(
               width: 380,
@@ -1059,11 +1093,11 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
   }
 
   Widget _buildFabsContent(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return _contentSection(
+      context,
+      title: 'Floating action buttons',
+      topPadding: 0,
       children: [
-        _sectionTitle(context, 'Floating Action Buttons'),
-        const SizedBox(height: 16),
         Wrap(spacing: 12, runSpacing: 12, children: [
           VFab(icon: Icons.add, tooltip: 'Add', onPressed: () {}),
           VFab(icon: Icons.edit, tooltip: 'Edit', onPressed: () {}),
@@ -1073,30 +1107,33 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
   }
 
   Widget _buildSegmentedContent(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return _contentSection(
+      context,
+      title: 'Segmented buttons',
+      topPadding: 0,
       children: [
-        _sectionTitle(context, 'Segmented Buttons'),
-        const SizedBox(height: 16),
-        VSegmented<String>(
-          value: _segmentValue,
-          onChanged: (v) => setState(() => _segmentValue = v),
-          options: const [
-            VSegmentOption(value: 'day', label: 'Day'),
-            VSegmentOption(value: 'week', label: 'Week'),
-            VSegmentOption(value: 'month', label: 'Month'),
-          ],
+        Align(
+          alignment: Alignment.centerLeft,
+          child: VSegmented<String>(
+            value: _segmentValue,
+            onChanged: (v) => setState(() => _segmentValue = v),
+            options: const [
+              VSegmentOption(value: 'day', label: 'Day'),
+              VSegmentOption(value: 'week', label: 'Week'),
+              VSegmentOption(value: 'month', label: 'Month'),
+            ],
+          ),
         ),
       ],
     );
   }
 
   Widget _buildIconButtonsContent(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return _contentSection(
+      context,
+      title: 'Icon buttons',
+      topPadding: 0,
       children: [
-        _sectionTitle(context, 'Icon Buttons'),
-        const SizedBox(height: 16),
         VButtonGroup(
           children: [
             VIconButton(icon: Icons.close, tooltip: 'Close', onPressed: () {}),
@@ -1110,11 +1147,11 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
   }
 
   Widget _buildChipsContent(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return _contentSection(
+      context,
+      title: 'Action chips',
+      topPadding: 0,
       children: [
-        _sectionTitle(context, 'Action Chips'),
-        const SizedBox(height: 16),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -2124,26 +2161,6 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
     );
   }
 
-  void _openSeedColorDialog(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => _SeedColorPickerDialog(
-        seedColor: widget.seedColor,
-        onSeedColorChanged: widget.onSeedColorChanged,
-        onClose: () => Navigator.of(dialogContext).pop(),
-        dialogContext: dialogContext,
-        onOpenColorWheel: () => _openColorWheelPicker(context),
-        recentColors: _recentPickerColors,
-        onAddToRecent: (color) => setState(() {
-          final next = _addToRecent(_recentPickerColors, color);
-          _recentPickerColors
-            ..clear()
-            ..addAll(next);
-        }),
-      ),
-    );
-  }
-
   void _openRadiusDialog(BuildContext context) {
     final initialRadius = widget.customRadius ?? _radiusSizeToNumber(widget.radiusSize);
     double localRadius = initialRadius;
@@ -2229,13 +2246,14 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
                 itemBuilder: (context, index) {
                   final option = options[index];
                   final isSelected = option.id == widget.selectedFontId;
-                  final style = Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontFamily: option.fontFamily,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                      );
                   return ListTile(
                     leading: isSelected ? const Icon(Icons.check) : const SizedBox.shrink(),
-                    title: Text(option.name, style: style),
+                    title: _FontPreviewText(
+                      fontId: option.id,
+                      name: option.name,
+                      selected: isSelected,
+                      fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize,
+                    ),
                     onTap: () {
                       widget.onFontChanged(option.id, option.textThemeBuilder);
                       Navigator.of(ctx).pop();
@@ -2256,17 +2274,6 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
     );
   }
 
-  void _openComponentSearch(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ComponentShowcaseScreen(
-          isDarkMode: widget.isDarkMode,
-          onDarkModeChanged: widget.onDarkModeChanged,
-        ),
-      ),
-    );
-  }
-
   Widget _colorChip(BuildContext context, String label, Color color) {
     final textColor = color.computeLuminance() > 0.55 ? Colors.black : Colors.white;
     return Container(
@@ -2274,8 +2281,7 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
       height: 72,
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black12),
+        borderRadius: context.vRadius.defaultBorderRadius(),
       ),
       alignment: Alignment.center,
       child: Column(
@@ -2296,14 +2302,7 @@ class _PlaygroundSidebarScreenState extends State<PlaygroundSidebarScreen> {
   }
 
   Widget _sectionTitle(BuildContext context, String text) {
-    return Text(
-      text,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-        fontWeight: FontWeight.w600,
-        letterSpacing: -0.2,
-        color: Theme.of(context).colorScheme.onSurface,
-      ),
-    );
+    return SizedBox(key: ValueKey(text), height: 0);
   }
 
 }
@@ -2323,6 +2322,47 @@ class _SidebarItem {
   const _SidebarItem({required this.id, required this.label, required this.icon});
 }
 
+class _SeedSwatch extends StatelessWidget {
+  const _SeedSwatch({
+    required this.color,
+    required this.selected,
+    required this.onTap,
+    this.icon,
+  });
+
+  final Color color;
+  final bool selected;
+  final VoidCallback onTap;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: Container(
+        width: 28,
+        height: 28,
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: selected ? cs.primary : cs.outlineVariant,
+            width: selected ? 2 : 1,
+          ),
+        ),
+        child: DecoratedBox(
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          child: icon == null
+              ? null
+              : Icon(icon, size: 14, color: color.computeLuminance() > 0.55 ? Colors.black : Colors.white),
+        ),
+      ),
+    );
+  }
+}
+
 class _SidebarTile extends StatelessWidget {
   final String label;
   final IconData icon;
@@ -2340,185 +2380,34 @@ class _SidebarTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final vc = theme.extension<VColors>() ?? VColors.fromScheme(cs);
+    final radius = BorderRadius.circular(8);
+    final foreground = selected ? cs.primary : cs.onSurfaceVariant;
+    final labelColor = selected ? cs.primary : cs.onSurface;
 
-    return Material(
-      color: selected ? vc.primary.withValues(alpha: 0.12) : Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                size: 20,
-                color: selected ? vc.primary : cs.onSurfaceVariant,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  label,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: selected ? vc.primary : cs.onSurface,
-                    fontWeight: selected ? FontWeight.w600 : null,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DashedBorderContainer extends StatelessWidget {
-  const _DashedBorderContainer({
-    required this.child,
-    required this.color,
-    this.padding = const EdgeInsets.all(12),
-    this.borderRadius = 10,
-  });
-
-  final Widget child;
-  final Color color;
-  final EdgeInsets padding;
-  final double borderRadius;
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _DashedRRectPainter(
-        color: color,
-        borderRadius: borderRadius,
-        strokeWidth: 1,
-        dashLength: 6,
-        gapLength: 4,
-      ),
-      child: Padding(
-        padding: padding,
-        child: child,
-      ),
-    );
-  }
-}
-
-class _DashedRRectPainter extends CustomPainter {
-  const _DashedRRectPainter({
-    required this.color,
-    required this.borderRadius,
-    required this.strokeWidth,
-    required this.dashLength,
-    required this.gapLength,
-  });
-
-  final Color color;
-  final double borderRadius;
-  final double strokeWidth;
-  final double dashLength;
-  final double gapLength;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (size.isEmpty) return;
-    final rect = Offset.zero & size;
-    final rrect = RRect.fromRectAndRadius(
-      rect.deflate(strokeWidth / 2),
-      Radius.circular(borderRadius),
-    );
-    final path = Path()..addRRect(rrect);
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth;
-
-    for (final metric in path.computeMetrics()) {
-      var distance = 0.0;
-      while (distance < metric.length) {
-        final next = min(distance + dashLength, metric.length);
-        canvas.drawPath(metric.extractPath(distance, next), paint);
-        distance += dashLength + gapLength;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DashedRRectPainter oldDelegate) {
-    return color != oldDelegate.color ||
-        borderRadius != oldDelegate.borderRadius ||
-        strokeWidth != oldDelegate.strokeWidth ||
-        dashLength != oldDelegate.dashLength ||
-        gapLength != oldDelegate.gapLength;
-  }
-}
-
-class _SeedColorButton extends StatelessWidget {
-  const _SeedColorButton({
-    required this.seedColor,
-    required this.onSeedColorChanged,
-    this.onOpenColorWheel,
-    this.recentColors = const [],
-    this.onAddToRecent,
-  });
-
-  final Color seedColor;
-  final ValueChanged<Color> onSeedColorChanged;
-  final VoidCallback? onOpenColorWheel;
-  final List<Color> recentColors;
-  final ValueChanged<Color>? onAddToRecent;
-
-  @override
-  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 4),
+      padding: const EdgeInsets.symmetric(vertical: 1),
       child: Material(
-        color: Colors.transparent,
+        color: selected ? cs.primary.withValues(alpha: 0.10) : Colors.transparent,
+        borderRadius: radius,
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: () {
-            showDialog<void>(
-              context: context,
-              builder: (dialogContext) => _SeedColorPickerDialog(
-                seedColor: seedColor,
-                onSeedColorChanged: onSeedColorChanged,
-                onClose: () => Navigator.of(dialogContext).pop(),
-                dialogContext: dialogContext,
-                onOpenColorWheel: onOpenColorWheel,
-                recentColors: recentColors,
-                onAddToRecent: onAddToRecent,
-              ),
-            );
-          },
+          onTap: onTap,
+          borderRadius: radius,
+          hoverColor: cs.onSurface.withValues(alpha: 0.04),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Seed color',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: seedColor,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                Icon(icon, size: 18, color: foreground),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: labelColor,
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                      letterSpacing: -0.1,
                     ),
                   ),
-                ),
-                const SizedBox(width: 4),
-                Icon(
-                  Icons.palette_outlined,
-                  size: 20,
-                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ],
             ),
@@ -2529,177 +2418,265 @@ class _SeedColorButton extends StatelessWidget {
   }
 }
 
-class _SeedColorPickerDialog extends StatefulWidget {
-  const _SeedColorPickerDialog({
-    required this.seedColor,
-    required this.onSeedColorChanged,
-    required this.onClose,
-    required this.dialogContext,
-    required this.onOpenColorWheel,
-    this.recentColors = const [],
-    this.onAddToRecent,
+class _FontDropdown extends StatefulWidget {
+  const _FontDropdown({
+    required this.getFontOptions,
+    required this.value,
+    required this.onChanged,
   });
 
-  final Color seedColor;
-  final ValueChanged<Color> onSeedColorChanged;
-  final VoidCallback onClose;
-  final BuildContext dialogContext;
-  final VoidCallback? onOpenColorWheel;
-  final List<Color> recentColors;
-  final ValueChanged<Color>? onAddToRecent;
+  final List<PlaygroundFontOption> Function() getFontOptions;
+  final String value;
+  final void Function(String id, TextTheme Function(TextTheme) builder) onChanged;
 
   @override
-  State<_SeedColorPickerDialog> createState() => _SeedColorPickerDialogState();
+  State<_FontDropdown> createState() => _FontDropdownState();
 }
 
-class _SeedColorPickerDialogState extends State<_SeedColorPickerDialog> {
-  bool _showingColorWheel = false;
+class _FontDropdownState extends State<_FontDropdown> {
+  final TextEditingController _controller = TextEditingController();
+  OverlayEntry? _entry;
 
   @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    if (_showingColorWheel) {
-      return AlertDialog(
-        title: const Text('Color wheel'),
-        content: SizedBox(
-          width: 420,
-          child: VColorWheelPicker(
-            initialColor: widget.seedColor,
-            commonColors: kVColorWheelCommonColors,
-            recentColors: widget.recentColors,
-            contentWidth: 420,
-            onPick: (color) {
-              widget.onSeedColorChanged(color);
-              widget.onAddToRecent?.call(color);
-              setState(() => _showingColorWheel = false);
-            },
-            onClose: () => setState(() => _showingColorWheel = false),
-          ),
-        ),
-        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
-      );
+  void initState() {
+    super.initState();
+    _controller.text = widget.value;
+  }
+
+  @override
+  void didUpdateWidget(covariant _FontDropdown oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.value != widget.value && _controller.text != widget.value) {
+      _controller.text = widget.value;
     }
-    return AlertDialog(
-      title: const Text('Seed color'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+  }
+
+  @override
+  void dispose() {
+    _removeEntry();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _removeEntry() {
+    _entry?.remove();
+    _entry = null;
+  }
+
+  void _close() {
+    if (_entry == null) return;
+    _removeEntry();
+    if (mounted) setState(() {});
+  }
+
+  void _toggle() {
+    if (_entry != null) {
+      _close();
+      return;
+    }
+
+    final box = context.findRenderObject() as RenderBox?;
+    final overlay = Overlay.of(context);
+    final overlayBox = overlay.context.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize || overlayBox == null) return;
+
+    final topLeft = box.localToGlobal(Offset.zero, ancestor: overlayBox);
+    final width = box.size.width;
+    const menuHeight = 320.0;
+    final spaceBelow = overlayBox.size.height - (topLeft.dy + box.size.height);
+    final maxTop = (overlayBox.size.height - menuHeight).clamp(8.0, overlayBox.size.height);
+    final top = spaceBelow >= menuHeight + 8
+        ? topLeft.dy + box.size.height + 4
+        : (topLeft.dy - menuHeight - 4).clamp(8.0, maxTop);
+
+    _entry = OverlayEntry(
+      builder: (overlayContext) {
+        final theme = Theme.of(overlayContext);
+        final cs = theme.colorScheme;
+        return Stack(
           children: [
-            Text(
-              'Select a color to generate the theme automatically (Material 3 ColorScheme.fromSeed).',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: cs.onSurfaceVariant,
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: _close,
               ),
             ),
-            const SizedBox(height: 20),
-            Wrap(
-              spacing: 12,
-              runSpacing: 20,
-              children: [
-                ..._kSeedOptions.map((color) {
-                  final isSelected = widget.seedColor == color;
-                  return GestureDetector(
-                    onTap: () {
-                      widget.onSeedColorChanged(color);
-                      Navigator.of(widget.dialogContext).pop();
-                    },
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isSelected ? cs.primary : cs.outline.withValues(alpha: 0.3),
-                              width: isSelected ? 3 : 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.15),
-                                blurRadius: 2,
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _colorToHex(color),
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: cs.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-                GestureDetector(
-                  onTap: () => setState(() => _showingColorWheel = true),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: cs.outline),
-                          gradient: const SweepGradient(
-                            center: Alignment.center,
-                            colors: [
-                              Color(0xFFFF0000),
-                              Color(0xFFFFFF00),
-                              Color(0xFF00FF00),
-                              Color(0xFF00FFFF),
-                              Color(0xFF0000FF),
-                              Color(0xFFFF00FF),
-                              Color(0xFFFF0000),
-                            ],
-                          ),
-                        ),
-                        child: Icon(Icons.touch_app, size: 20, color: cs.onSurface),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Color wheel',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: cs.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
+            Positioned(
+              left: topLeft.dx,
+              top: top,
+              width: width,
+              height: menuHeight,
+              child: Material(
+                color: cs.surface,
+                elevation: 6,
+                shadowColor: Colors.black26,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: cs.outlineVariant),
                 ),
-              ],
+                clipBehavior: Clip.antiAlias,
+                child: _FontMenuPanel(
+                  options: widget.getFontOptions(),
+                  selectedId: widget.value,
+                  onSelected: (option) {
+                    widget.onChanged(option.id, option.textThemeBuilder);
+                    _close();
+                  },
+                ),
+              ),
             ),
           ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: widget.onClose,
-          child: const Text('Close'),
-        ),
-      ],
-      contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
-      actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+        );
+      },
+    );
+    overlay.insert(_entry!);
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final open = _entry != null;
+    return VTextBox(
+      controller: _controller,
+      label: null,
+      hint: 'Font',
+      readOnly: true,
+      filled: true,
+      controlHeight: 40,
+      suffixIcon: Icon(open ? Icons.arrow_drop_up : Icons.arrow_drop_down),
+      onTap: _toggle,
     );
   }
 }
 
-String _radiusLabel(VRadiusSize size) {
-  switch (size) {
-    case VRadiusSize.none:
-      return 'None';
-    case VRadiusSize.sm:
-      return 'SM';
-    case VRadiusSize.md:
-      return 'MD';
-    case VRadiusSize.lg:
-      return 'LG';
+class _FontMenuPanel extends StatefulWidget {
+  const _FontMenuPanel({
+    required this.options,
+    required this.selectedId,
+    required this.onSelected,
+  });
+
+  final List<PlaygroundFontOption> options;
+  final String selectedId;
+  final ValueChanged<PlaygroundFontOption> onSelected;
+
+  @override
+  State<_FontMenuPanel> createState() => _FontMenuPanelState();
+}
+
+class _FontMenuPanelState extends State<_FontMenuPanel> {
+  final TextEditingController _filter = TextEditingController();
+  final ScrollController _scroll = ScrollController();
+  String _query = '';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_scroll.hasClients || _query.isNotEmpty) return;
+        final index = widget.options.indexWhere((option) => option.id == widget.selectedId);
+        if (index <= 0) return;
+        final target = (index * 40.0) - 80;
+        _scroll.jumpTo(target.clamp(0, _scroll.position.maxScrollExtent));
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _filter.dispose();
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  List<PlaygroundFontOption> get _matches {
+    final query = _query.trim().toLowerCase();
+    if (query.isEmpty) return widget.options;
+    return [
+      for (final option in widget.options)
+        if (option.name.toLowerCase().contains(query)) option,
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final matches = _matches;
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+          child: TextField(
+            controller: _filter,
+            autofocus: true,
+            style: theme.textTheme.bodyMedium,
+            decoration: InputDecoration(
+              isDense: true,
+              hintText: 'Search fonts',
+              prefixIcon: const Icon(Icons.search, size: 18),
+              filled: true,
+              fillColor: cs.surfaceContainerLow,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+            ),
+            onChanged: (value) {
+              setState(() => _query = value);
+              if (_scroll.hasClients) _scroll.jumpTo(0);
+            },
+            onSubmitted: (_) {
+              if (matches.isNotEmpty) widget.onSelected(matches.first);
+            },
+          ),
+        ),
+        Expanded(
+          child: matches.isEmpty
+              ? Center(
+                  child: Text(
+                    'No fonts',
+                    style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                  ),
+                )
+              : ListView.builder(
+                  controller: _scroll,
+                  padding: const EdgeInsets.only(bottom: 8),
+                  itemCount: matches.length,
+                  itemExtent: 40,
+                  itemBuilder: (context, index) {
+                    final option = matches[index];
+                    final selected = option.id == widget.selectedId;
+                    return InkWell(
+                      onTap: () => widget.onSelected(option),
+                      child: ColoredBox(
+                        color: selected ? cs.primary.withValues(alpha: 0.10) : Colors.transparent,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: _FontPreviewText(
+                                  fontId: option.id,
+                                  name: option.name,
+                                  selected: selected,
+                                ),
+                              ),
+                              if (selected)
+                                Icon(Icons.check, size: 16, color: cs.primary),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
   }
 }
 
@@ -2716,275 +2693,61 @@ double _radiusSizeToNumber(VRadiusSize size) {
   }
 }
 
-class _FontAutocomplete extends StatefulWidget {
-  const _FontAutocomplete({
-    required this.getFontOptions,
-    required this.value,
-    required this.onChanged,
+class _FontPreviewText extends StatefulWidget {
+  const _FontPreviewText({
+    required this.fontId,
+    required this.name,
+    required this.selected,
+    this.fontSize,
   });
 
-  final List<PlaygroundFontOption> Function() getFontOptions;
-  final String value;
-  final void Function(String id, TextTheme Function(TextTheme) builder) onChanged;
+  final String fontId;
+  final String name;
+  final bool selected;
+  final double? fontSize;
 
   @override
-  State<_FontAutocomplete> createState() => _FontAutocompleteState();
+  State<_FontPreviewText> createState() => _FontPreviewTextState();
 }
 
-class _FontAutocompleteState extends State<_FontAutocomplete> {
-  late TextEditingController _controller;
-  late FocusNode _focusNode;
-  List<PlaygroundFontOption>? _options;
-  Map<String, PlaygroundFontOption>? _optionById;
-  static const int _maxOptions = 40;
-
+class _FontPreviewTextState extends State<_FontPreviewText> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.value);
-    _focusNode = FocusNode()..addListener(_onFocusChange);
-  }
-
-  void _onFocusChange() {
-    if (_focusNode.hasFocus && _options == null) _loadOptions();
-  }
-
-  void _loadOptions() {
-    final list = widget.getFontOptions();
-    if (mounted) {
-      setState(() {
-        _options = list;
-        _optionById = {for (final o in list) o.id: o};
-      });
-    }
+    _awaitFont();
   }
 
   @override
-  void dispose() {
-    _focusNode.removeListener(_onFocusChange);
-    _focusNode.dispose();
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(covariant _FontAutocomplete oldWidget) {
+  void didUpdateWidget(covariant _FontPreviewText oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.value != widget.value) {
-      _controller.text = widget.value;
-    }
+    if (oldWidget.fontId != widget.fontId) _awaitFont();
   }
 
-  Iterable<String> _filterOptions(String query) {
-    final options = _options ?? [];
-    if (options.isEmpty) return const <String>[];
-    if (query.isEmpty) {
-      return options.take(_maxOptions).map((o) => o.id);
-    }
-    final lower = query.toLowerCase();
-    return options
-        .where((o) => o.name.toLowerCase().contains(lower))
-        .take(_maxOptions)
-        .map((o) => o.id);
+  void _awaitFont() {
+    final style = GoogleFonts.getFont(widget.fontId);
+    unawaited(
+      GoogleFonts.pendingFonts([style]).then((_) {
+        if (mounted) setState(() {});
+      }, onError: (_) {}),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final baseStyle = theme.textTheme.bodyLarge;
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, right: 4),
-      child: SizedBox(
-        width: 200,
-        height: 40,
-        child: RawAutocomplete<String>(
-          textEditingController: _controller,
-          focusNode: _focusNode,
-          optionsBuilder: (value) => _filterOptions(value.text.trim()),
-          onSelected: (id) {
-            final option = _optionById?[id];
-            if (option != null) {
-              _controller.text = id;
-              widget.onChanged(id, option.textThemeBuilder);
-            }
-          },
-          fieldViewBuilder: (context, controller, focusNode, onSubmitted) {
-            return VTextBox(
-              controller: controller,
-              focusNode: focusNode,
-              label: 'Font',
-              hint: 'Search or select font',
-              readOnly: false,
-              filled: true,
-              controlHeight: 40,
-              suffixIcon: const Icon(Icons.arrow_drop_down),
-              onTap: () => focusNode.requestFocus(),
-            );
-          },
-          optionsViewBuilder: (context, onSelected, options) {
-            final optionById = _optionById ?? {};
-            return Align(
-              alignment: Alignment.topLeft,
-              child: Material(
-                elevation: 4,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 280),
-                  child: ListView.builder(
-                    padding: EdgeInsets.zero,
-                    itemCount: options.length,
-                    itemBuilder: (context, index) {
-                      final id = options.elementAt(index);
-                      final option = optionById[id];
-                      final name = option?.name ?? id;
-                      final fontFamily = option?.fontFamily;
-                      final style = fontFamily != null
-                          ? baseStyle?.copyWith(fontFamily: fontFamily)
-                          : baseStyle;
-                      return ListTile(
-                        title: Text(name, style: style),
-                        onTap: () => onSelected(id),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
+    final cs = theme.colorScheme;
+    return Text(
+      widget.name,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: GoogleFonts.getFont(
+        widget.fontId,
+        fontSize: widget.fontSize ?? theme.textTheme.bodyMedium?.fontSize ?? 14,
+        fontWeight: FontWeight.w400,
+        color: widget.selected ? cs.primary : cs.onSurface,
+        height: 1.2,
       ),
     );
   }
 }
 
-class _RadiusChip extends StatelessWidget {
-  const _RadiusChip({
-    required this.radiusSize,
-    required this.onRadiusSizeChanged,
-    this.customRadius,
-    this.onCustomRadiusChanged,
-  });
-
-  final VRadiusSize radiusSize;
-  final ValueChanged<VRadiusSize> onRadiusSizeChanged;
-  final double? customRadius;
-  final ValueChanged<double>? onCustomRadiusChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, right: 4),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: () {
-            final initialRadius =
-                customRadius ?? _radiusSizeToNumber(radiusSize);
-            double localRadius = initialRadius;
-            showDialog<void>(
-              context: context,
-              builder: (ctx) {
-                return StatefulBuilder(
-                  builder: (ctx, setStateDialog) => AlertDialog(
-                    title: const Text('Corner radius'),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          'Default radius for buttons, fields, and cards. Changes apply immediately.',
-                          style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(ctx)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
-                        ),
-                        const SizedBox(height: 20),
-                        VSegmented<VRadiusSize>(
-                          value: radiusSize,
-                          onChanged: (v) {
-                            onRadiusSizeChanged(v);
-                            Navigator.of(ctx).pop();
-                          },
-                          options: const [
-                            VSegmentOption(
-                                value: VRadiusSize.none, label: 'None'),
-                            VSegmentOption(
-                                value: VRadiusSize.sm, label: 'SM'),
-                            VSegmentOption(
-                                value: VRadiusSize.md, label: 'MD'),
-                            VSegmentOption(
-                                value: VRadiusSize.lg, label: 'LG'),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Custom radius (0–200): ${localRadius.round()}',
-                          style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(ctx)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
-                        ),
-                        VSlider(
-                          value: localRadius,
-                          onChanged: onCustomRadiusChanged == null
-                              ? null
-                              : (v) {
-                                  setStateDialog(() => localRadius = v);
-                                  onCustomRadiusChanged?.call(v);
-                                },
-                          min: 0,
-                          max: 200,
-                          divisions: 200,
-                        ),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        child: const Text('Close'),
-                      ),
-                    ],
-                    contentPadding:
-                        const EdgeInsets.fromLTRB(24, 20, 24, 8),
-                    actionsPadding:
-                        const EdgeInsets.fromLTRB(24, 0, 24, 16),
-                  ),
-                );
-              },
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Corner radius',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Icon(
-                  Icons.rounded_corner,
-                  size: 20,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  customRadius != null
-                      ? 'Custom (${customRadius!.round()})'
-                      : _radiusLabel(radiusSize),
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(fontSize: 15),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}

@@ -1,6 +1,6 @@
 name: vistalityui
 description: "Material 3 Flutter component library with seed theming, forms, data, and feedback."
-version: 3.0.1
+version: 3.1.0
 repository: https://github.com/vistalrodelo/vistalityui
 issue_tracker: https://github.com/vistalrodelo/vistalityui/issues
 topics:
@@ -31,9 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
   file_selector: ^1.0.3
-  desktop_drop: ^0.7.0
   flutter_dropzone: ^4.2.1
-  image_cropper: ^11.0.0
+  image_cropper: ^13.0.0
 
 dev_dependencies:
   flutter_test:

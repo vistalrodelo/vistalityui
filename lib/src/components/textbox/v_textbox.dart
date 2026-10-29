@@ -241,7 +241,9 @@ class VTextBox extends StatelessWidget {
         suffixIconConstraints: iconConstraints,
         isDense: true,
         filled: filled,
-        fillColor: enabled ? cs.surface : cs.surface.withValues(alpha: 0.4),
+        fillColor: enabled
+            ? cs.surfaceContainerLowest
+            : cs.surfaceContainerLowest.withValues(alpha: 0.6),
         contentPadding: resolvedPadding,
         border: border,
         enabledBorder: border,

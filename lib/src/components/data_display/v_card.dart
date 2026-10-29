@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../foundation/v_colors.dart';
 import '../../foundation/v_radius.dart';
 
 /// Base card container with border and padding.
@@ -14,19 +13,17 @@ class VCard extends StatelessWidget {
   const VCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(12),
+    this.padding = const EdgeInsets.all(16),
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    final vc = theme.extension<VColors>() ?? VColors.fromScheme(cs);
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: padding,
       decoration: BoxDecoration(
         color: cs.surface,
-        border: Border.all(color: vc.outline),
+        border: Border.all(color: cs.outlineVariant),
         borderRadius: context.vRadius.defaultBorderRadius(),
       ),
       child: child,
