@@ -1,3 +1,8 @@
+## 3.2.0
+
+* `VTextBox` can autofocus and show `prefixText` inside the field.
+* `VCard` can be tapped, and accepts margin, color, radius, and shadow. Untapped cards keep the theme radius and surface color.
+
 ## 3.1.0
 
 * Update `image_cropper` to the current release.

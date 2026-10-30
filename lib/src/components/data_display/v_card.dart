@@ -9,24 +9,71 @@ class VCard extends StatelessWidget {
   /// Inner padding for the card.
   final EdgeInsetsGeometry padding;
 
+  /// Outer margin around the card.
+  final EdgeInsetsGeometry? margin;
+
+  /// Fill color. Defaults to the theme surface color.
+  final Color? color;
+
+  /// Called when the card is tapped. The splash follows the card radius.
+  final VoidCallback? onTap;
+
+  /// Radius token or identifier resolved by [VRadius].
+  final Object? radius;
+
+  /// Explicit radius override when not using a token.
+  final double? radiusValue;
+
+  /// Full corner radius. Wins over [radius] and [radiusValue].
+  final BorderRadius? borderRadius;
+
+  /// Drop shadow drawn behind the card.
+  final List<BoxShadow>? shadow;
+
   /// Creates a [VCard].
   const VCard({
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(16),
+    this.margin,
+    this.color,
+    this.onTap,
+    this.radius,
+    this.radiusValue,
+    this.borderRadius,
+    this.shadow,
   });
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final resolvedRadius = borderRadius ??
+        context.vRadius.resolveBorderRadius(
+          radius: radius,
+          radiusValue: radiusValue,
+        );
     return Container(
-      padding: padding,
+      margin: margin,
       decoration: BoxDecoration(
-        color: cs.surface,
-        border: Border.all(color: cs.outlineVariant),
-        borderRadius: context.vRadius.defaultBorderRadius(),
+        borderRadius: resolvedRadius,
+        boxShadow: shadow,
       ),
-      child: child,
+      child: Material(
+        color: color ?? cs.surface,
+        borderRadius: resolvedRadius,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: resolvedRadius,
+          child: Ink(
+            decoration: BoxDecoration(
+              borderRadius: resolvedRadius,
+              border: Border.all(color: cs.outlineVariant),
+            ),
+            child: Padding(padding: padding, child: child),
+          ),
+        ),
+      ),
     );
   }
 }

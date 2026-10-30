@@ -39,6 +39,41 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
+  testWidgets('VTextBox autofocuses and shows prefix text', (tester) async {
+    final controller = TextEditingController();
+    await tester.pumpWidget(
+      _app(
+        VTextBox(
+          controller: controller,
+          label: 'Price',
+          prefixText: '₱ ',
+          autofocus: true,
+        ),
+      ),
+    );
+
+    expect(tester.testTextInput.isVisible, isTrue);
+    expect(find.text('₱ '), findsOneWidget);
+    controller.dispose();
+  });
+
+  testWidgets('VCard reports taps', (tester) async {
+    var taps = 0;
+    await tester.pumpWidget(
+      _app(
+        VCard(
+          onTap: () => taps++,
+          margin: const EdgeInsets.all(8),
+          child: const Text('Open note'),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open note'));
+    await tester.pump();
+    expect(taps, 1);
+  });
+
   testWidgets('VAlert dismisses through onClose', (tester) async {
     var closed = false;
     await tester.pumpWidget(

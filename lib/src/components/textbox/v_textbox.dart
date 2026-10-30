@@ -75,6 +75,12 @@ class VTextBox extends StatelessWidget {
   /// Optional prefix icon (widget or IconData).
   final Object? prefixIcon;
 
+  /// Optional text shown inside the field, before the value.
+  final String? prefixText;
+
+  /// Whether this field is focused when first shown.
+  final bool autofocus;
+
   /// Optional suffix icon (widget or IconData).
   final Object? suffixIcon;
 
@@ -136,6 +142,8 @@ class VTextBox extends StatelessWidget {
     this.textInputAction,
     this.textCapitalization = TextCapitalization.none,
     this.prefixIcon,
+    this.prefixText,
+    this.autofocus = false,
     this.suffixIcon,
     this.contentPadding,
     this.controlHeight,
@@ -210,6 +218,7 @@ class VTextBox extends StatelessWidget {
     final textField = TextField(
       controller: controller,
       focusNode: focusNode,
+      autofocus: autofocus,
       enabled: enabled,
       readOnly: readOnly,
       obscureText: obscureText,
@@ -236,6 +245,7 @@ class VTextBox extends StatelessWidget {
             ? const TextStyle(fontSize: 0, height: 0)
             : null,
         prefixIcon: _resolveIcon(prefixIcon),
+        prefixText: prefixText,
         suffixIcon: _resolveIcon(suffixIcon),
         prefixIconConstraints: iconConstraints,
         suffixIconConstraints: iconConstraints,
